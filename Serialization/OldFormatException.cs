@@ -1,4 +1,4 @@
-﻿/*
+/*
   KeePass Password Safe - The Open-Source Password Manager
   Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
@@ -17,26 +17,30 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-// General assembly properties
-[assembly: AssemblyTitle("KeePassLib")]
-[assembly: AssemblyDescription("KeePass Password Management Library")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Dominik Reichl")]
-[assembly: AssemblyProduct("KeePassLib")]
-[assembly: AssemblyCopyright("Copyright © 2003-2007 Dominik Reichl")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+using KeePassLib.Resources;
 
-// COM settings
-[assembly: ComVisible(false)]
+namespace KeePassLib.Serialization
+{
+	public sealed class OldFormatException : Exception
+	{
+		private string m_strFormat = string.Empty;
 
-// Assembly GUID
-[assembly: Guid("395f6eec-a1e0-4438-aa82-b75099348134")]
+		public override string Message
+		{
+			get
+			{
+				return KLRes.OldFormat + ((m_strFormat.Length > 0) ?
+					(@" (" + m_strFormat + @")") : string.Empty) + ".";
+			}
+		}
 
-// Assembly version information
-[assembly: AssemblyVersion("2.0.1.*")]
-[assembly: AssemblyFileVersion("2.0.1.0")]
+		public OldFormatException(string strFormatName)
+		{
+			if(strFormatName != null) m_strFormat = strFormatName;
+		}
+	}
+}
