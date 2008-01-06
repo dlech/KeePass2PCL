@@ -18,29 +18,36 @@
 */
 
 using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Diagnostics;
+using System.Security.Cryptography;
 
 using KeePassLib.Security;
 
 namespace KeePassLib.Keys
 {
-	/// <summary>
-	/// Interface to a user key, like a password, key file data, etc.
-	/// </summary>
-	public interface IUserKey
+	public sealed class KcpCustomKey : IUserKey
 	{
-		/// <summary>
-		/// Get key data. Querying this property is fast (it returns a
-		/// reference to a cached <c>ProtectedBinary</c> object).
-		/// If no key data is available, <c>null</c> is returned.
-		/// </summary>
-		ProtectedBinary KeyData
+		private ProtectedBinary m_pbKey;
+
+		public ProtectedBinary KeyData
 		{
-			get;
+			get { return m_pbKey; }
 		}
 
-		/// <summary>
-		/// Clear the key and securely erase all security-critical information.
-		/// </summary>
-		void Clear();
+		public KcpCustomKey(byte[] pb)
+		{
+			Debug.Assert(pb != null); if(pb == null) throw new ArgumentNullException();
+
+			SHA256Managed sha256 = new SHA256Managed();
+			byte[] pbRaw = sha256.ComputeHash(pb);
+			m_pbKey = new ProtectedBinary(true, pbRaw);
+		}
+
+		public void Clear()
+		{
+			m_pbKey.Clear();
+		}
 	}
 }

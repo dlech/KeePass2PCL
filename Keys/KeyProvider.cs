@@ -18,29 +18,23 @@
 */
 
 using System;
-
-using KeePassLib.Security;
+using System.Collections.Generic;
+using System.Text;
 
 namespace KeePassLib.Keys
 {
-	/// <summary>
-	/// Interface to a user key, like a password, key file data, etc.
-	/// </summary>
-	public interface IUserKey
+	public abstract class KeyProvider
 	{
-		/// <summary>
-		/// Get key data. Querying this property is fast (it returns a
-		/// reference to a cached <c>ProtectedBinary</c> object).
-		/// If no key data is available, <c>null</c> is returned.
-		/// </summary>
-		ProtectedBinary KeyData
+		public abstract string Name
 		{
 			get;
 		}
 
-		/// <summary>
-		/// Clear the key and securely erase all security-critical information.
-		/// </summary>
-		void Clear();
+		// public virtual PwIcon ImageIndex
+		// {
+		//	get { return PwIcon.UserKey; }
+		// }
+
+		public abstract byte[] GetKey();
 	}
 }
