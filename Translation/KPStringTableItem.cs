@@ -1,4 +1,4 @@
-﻿/*
+/*
   KeePass Password Safe - The Open-Source Password Manager
   Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
@@ -17,26 +17,27 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Xml.Serialization;
 
-// General assembly properties
-[assembly: AssemblyTitle("KeePassLib")]
-[assembly: AssemblyDescription("KeePass Password Management Library")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Dominik Reichl")]
-[assembly: AssemblyProduct("KeePassLib")]
-[assembly: AssemblyCopyright("Copyright © 2003-2008 Dominik Reichl")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+namespace KeePassLib.Translation
+{
+	public sealed class KPStringTableItem
+	{
+		private string m_strName = string.Empty;
+		public string Name
+		{
+			get { return m_strName; }
+			set { m_strName = value; }
+		}
 
-// COM settings
-[assembly: ComVisible(false)]
-
-// Assembly GUID
-[assembly: Guid("395f6eec-a1e0-4438-aa82-b75099348134")]
-
-// Assembly version information
-[assembly: AssemblyVersion("2.0.5.*")]
-[assembly: AssemblyFileVersion("2.0.5.0")]
+		private string m_strValue = string.Empty;
+		public string Value
+		{
+			get { return m_strValue; }
+			set { m_strValue = value; }
+		}
+	}
+}
