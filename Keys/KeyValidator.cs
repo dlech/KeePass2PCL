@@ -1,4 +1,4 @@
-/*
+﻿/*
   KeePass Password Safe - The Open-Source Password Manager
   Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
@@ -20,50 +20,32 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Diagnostics;
-using System.Security.Cryptography;
-
-using KeePassLib.Security;
 
 namespace KeePassLib.Keys
 {
-	public sealed class KcpCustomKey : IUserKey
+	public enum KeyValidationType
 	{
-		private string m_strName;
-		private ProtectedBinary m_pbKey;
+		MasterPassword = 0
+	}
+
+	public abstract class KeyValidator
+	{
+		/// <summary>
+		/// Name of your key validator (should be unique).
+		/// </summary>
+		public abstract string Name
+		{
+			get;
+		}
 
 		/// <summary>
-		/// Name of the provider that generated the custom key.
+		/// Validate a key.
 		/// </summary>
-		public string Name
-		{
-			get { return m_strName; }
-		}
-
-		public ProtectedBinary KeyData
-		{
-			get { return m_pbKey; }
-		}
-
-		public KcpCustomKey(string strName, byte[] pbKeyData, bool bPerformHash)
-		{
-			Debug.Assert(strName != null); if(strName == null) throw new ArgumentNullException("strName");
-			Debug.Assert(pbKeyData != null); if(pbKeyData == null) throw new ArgumentNullException("pbKeyData");
-
-			m_strName = strName;
-
-			if(bPerformHash)
-			{
-				SHA256Managed sha256 = new SHA256Managed();
-				byte[] pbRaw = sha256.ComputeHash(pbKeyData);
-				m_pbKey = new ProtectedBinary(true, pbRaw);
-			}
-			else m_pbKey = new ProtectedBinary(true, pbKeyData);
-		}
-
-		public void Clear()
-		{
-			m_pbKey.Clear();
-		}
+		/// <param name="strKey">Key to validate.</param>
+		/// <param name="t">Type of the validation to perform.</param>
+		/// <returns>Returns <c>null</c>, if the validation is successful.
+		/// If there's a problem with the key, the returned string describes
+		/// the problem.</returns>
+		public abstract string Validate(string strKey, KeyValidationType t);
 	}
 }
