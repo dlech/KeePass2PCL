@@ -1,6 +1,8 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
   Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  
+  Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -242,6 +244,42 @@ namespace KeePassLib.Serialization
 				FileShare.Read);
 		}
 
+#if KeePassLibAndroid
+		class UploadOnCloseMemoryStream: MemoryStream
+		{
+			System.Net.WebClient webClient;
+			string method;
+			Uri destinationFilePath;
+			
+			public UploadOnCloseMemoryStream(System.Net.WebClient _webClient, string _method, Uri _destinationFilePath)
+			{
+				this.webClient = _webClient;
+				this.method = _method;
+				this.destinationFilePath = _destinationFilePath;
+			}
+
+			public UploadOnCloseMemoryStream(System.Net.WebClient _webClient, Uri _destinationFilePath)
+			{
+				this.webClient = _webClient;
+				this.method = null;
+				this.destinationFilePath = _destinationFilePath;
+			}
+
+			public override void Close()
+			{
+				base.Close();
+				if (method != null)
+				{
+					webClient.UploadData(destinationFilePath, method, this.ToArray());
+				} else
+				{
+					webClient.UploadData(destinationFilePath, this.ToArray());
+				}
+				
+			}
+		}
+#endif
+
 #if !KeePassLibSD
 		public static Stream OpenWrite(IOConnectionInfo ioc)
 		{
@@ -256,9 +294,13 @@ namespace KeePassLib.Serialization
 			if(NativeLib.IsUnix() && (uri.Scheme.Equals(Uri.UriSchemeHttp,
 				StrUtil.CaseIgnoreCmp) || uri.Scheme.Equals(Uri.UriSchemeHttps,
 				StrUtil.CaseIgnoreCmp)))
+#if KeePassLibAndroid
+				return new UploadOnCloseMemoryStream(CreateWebClient(ioc), WebRequestMethods.Http.Put, uri);
+			return new UploadOnCloseMemoryStream(CreateWebClient(ioc), uri);
+#else
 				return CreateWebClient(ioc).OpenWrite(uri, WebRequestMethods.Http.Put);
-
 			return CreateWebClient(ioc).OpenWrite(uri);
+#endif		
 		}
 #else
 		public static Stream OpenWrite(IOConnectionInfo ioc)
@@ -296,7 +338,11 @@ namespace KeePassLib.Serialization
 			try
 			{
 				Stream s = OpenRead(ioc);
+#if KeePassLibAndroid
+				if(s == null) throw new Java.IO.FileNotFoundException();
+#else
 				if(s == null) throw new FileNotFoundException();
+#endif
 
 				try { s.ReadByte(); }
 				catch(Exception) { }

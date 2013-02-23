@@ -1,6 +1,8 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
   Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  
+  Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,7 +35,11 @@ namespace KeePassLib
 	{
 		private PwUuid m_pwUuid;
 		private byte[] m_pbImageDataPng;
+#if KeePassLibAndroid
+		private Android.Graphics.Bitmap m_pCachedImage;
+#else
 		private Image m_pCachedImage;
+#endif
 
 		public PwUuid Uuid
 		{
@@ -45,7 +51,11 @@ namespace KeePassLib
 			get { return m_pbImageDataPng; }
 		}
 
+#if KeePassLibAndroid
+		public Android.Graphics.Bitmap Image
+#else
 		public Image Image
+#endif
 		{
 			get { return m_pCachedImage; }
 		}

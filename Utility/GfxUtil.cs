@@ -1,6 +1,8 @@
-﻿/*
+/*
   KeePass Password Safe - The Open-Source Password Manager
   Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  
+  Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,14 +24,22 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Diagnostics;
+#if KeePassLibAndroid
+using Android.Graphics;
+#else
+using System.Windows.Forms;
+#endif
 
 namespace KeePassLib.Utility
 {
 	public static class GfxUtil
 	{
+#if KeePassLibAndroid
+		public static Android.Graphics.Bitmap LoadImage(byte[] pb)
+#else
 		public static Image LoadImage(byte[] pb)
+#endif
 		{
 			if(pb == null) throw new ArgumentNullException("pb");
 
@@ -37,13 +47,24 @@ namespace KeePassLib.Utility
 			try { return LoadImagePriv(ms); }
 			catch(Exception)
 			{
+#if KeePassLibAndroid
+				Android.Graphics.Bitmap imgIco = TryLoadIco(pb);
+#else
 				Image imgIco = TryLoadIco(pb);
+#endif
 				if(imgIco != null) return imgIco;
 				throw;
 			}
 			finally { ms.Close(); }
 		}
 
+#if KeePassLibAndroid
+		private static Android.Graphics.Bitmap LoadImagePriv(Stream s)
+		{
+			Android.Graphics.Bitmap img = BitmapFactory.DecodeStream(s);
+			return img;			
+		}
+#else
 		private static Image LoadImagePriv(Stream s)
 		{
 			// Image.FromStream wants the stream to be open during
@@ -71,7 +92,14 @@ namespace KeePassLib.Utility
 			}
 			finally { if(imgSrc != null) imgSrc.Dispose(); }
 		}
+#endif
 
+#if KeePassLibAndroid
+		private static Android.Graphics.Bitmap TryLoadIco(byte[] pb)
+		{
+			throw new NotImplementedException();
+		}
+#else
 		private static Image TryLoadIco(byte[] pb)
 		{
 #if !KeePassLibSD
@@ -83,5 +111,6 @@ namespace KeePassLib.Utility
 
 			return null;
 		}
+#endif
 	}
 }

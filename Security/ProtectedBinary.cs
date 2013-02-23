@@ -1,6 +1,8 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
   Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  
+  Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -73,6 +75,10 @@ namespace KeePassLib.Security
 
 		static ProtectedBinary()
 		{
+#if KeePassLibAndroid
+			//protection not supported on Android currently
+			m_bProtectionSupported = false;
+#else
 			try // Test whether ProtectedMemory is supported
 			{
 				byte[] pbDummy = new byte[PmBlockSize * 2];
@@ -83,6 +89,7 @@ namespace KeePassLib.Security
 			{
 				m_bProtectionSupported = false;
 			}
+#endif
 		}
 
 		/// <summary>
@@ -143,7 +150,11 @@ namespace KeePassLib.Security
 
 			// Data size must be > 0, otherwise 'Protect' throws
 			if(m_bProtected && m_bProtectionSupported && (m_uDataLen > 0))
+#if KeePassLibAndroid
+				throw new NotSupportedException();
+#else
 				ProtectedMemory.Protect(m_pbData, MemoryProtectionScope.SameProcess);
+#endif
 		}
 
 		/// <summary>
@@ -164,9 +175,13 @@ namespace KeePassLib.Security
 			{
 				lock(m_objSync)
 				{
+#if KeePassLibAndroid
+					throw new NotSupportedException();
+#else
 					ProtectedMemory.Unprotect(m_pbData, MemoryProtectionScope.SameProcess);
 					Array.Copy(m_pbData, pbReturn, (int)m_uDataLen);
 					ProtectedMemory.Protect(m_pbData, MemoryProtectionScope.SameProcess);
+#endif
 				}
 			}
 			else Array.Copy(m_pbData, pbReturn, (int)m_uDataLen);

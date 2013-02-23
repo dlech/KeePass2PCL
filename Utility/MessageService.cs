@@ -1,6 +1,8 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
   Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  
+  Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,25 +23,51 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
-using System.Windows.Forms;
 using System.Diagnostics;
+#if !KeePassLibAndroid
+using System.Windows.Forms;
+#endif
 
 using KeePassLib.Resources;
 using KeePassLib.Serialization;
 
 namespace KeePassLib.Utility
 {
+#if KeePassLibAndroid
+	public enum MessageBoxButtons
+	{
+		OK, OKCancel, AbortRetryIgnore, YesNoCancel, YesNo, RetryCancel
+	}
+	public enum MessageBoxIcon
+	{
+		Information, Warning, Error, Question
+	}
+	public enum MessageBoxDefaultButton
+	{
+		Button1, Button2, Button3
+	}
+
+	public enum DialogResult
+	{
+		Yes, No, Cancel, Retry, Abort
+	}
+#endif
+
 	public sealed class MessageServiceEventArgs : EventArgs
 	{
 		private string m_strTitle = string.Empty;
 		private string m_strText = string.Empty;
+#if !KeePassLibAndroid
 		private MessageBoxButtons m_msgButtons = MessageBoxButtons.OK;
 		private MessageBoxIcon m_msgIcon = MessageBoxIcon.None;
+#endif
 
 		public string Title { get { return m_strTitle; } }
 		public string Text { get { return m_strText; } }
+#if !KeePassLibAndroid
 		public MessageBoxButtons Buttons { get { return m_msgButtons; } }
 		public MessageBoxIcon Icon { get { return m_msgIcon; } }
+#endif
 
 		public MessageServiceEventArgs() { }
 
@@ -48,8 +76,10 @@ namespace KeePassLib.Utility
 		{
 			m_strTitle = (strTitle ?? string.Empty);
 			m_strText = (strText ?? string.Empty);
+#if !KeePassLibAndroid
 			m_msgButtons = msgButtons;
 			m_msgIcon = msgIcon;
+#endif
 		}
 	}
 
@@ -61,9 +91,10 @@ namespace KeePassLib.Utility
 		private const MessageBoxIcon m_mbiInfo = MessageBoxIcon.Information;
 		private const MessageBoxIcon m_mbiWarning = MessageBoxIcon.Warning;
 		private const MessageBoxIcon m_mbiFatal = MessageBoxIcon.Error;
-
+#if !KeePassLibAndroid
 		private const MessageBoxOptions m_mboRtl = (MessageBoxOptions.RtlReading |
 			MessageBoxOptions.RightAlign);
+#endif
 #else
 		private const MessageBoxIcon m_mbiInfo = MessageBoxIcon.Asterisk;
 		private const MessageBoxIcon m_mbiWarning = MessageBoxIcon.Exclamation;
@@ -158,7 +189,7 @@ namespace KeePassLib.Utility
 			return sbText.ToString();
 		}
 
-#if !KeePassLibSD
+#if !KeePassLibSD && !KeePassLibAndroid
 		internal static Form GetTopForm()
 		{
 			FormCollection fc = Application.OpenForms;
@@ -173,6 +204,13 @@ namespace KeePassLib.Utility
 		{
 #if KeePassLibSD
 			return MessageBox.Show(strText, strTitle, mb, mi, mdb);
+#elif KeePassLibAndroid
+			if (mb == MessageBoxButtons.OK)
+			{
+				//Android.Widget.Toast toast = ..
+			}
+			//this might help: http://www.gregshackles.com/2011/04/using-background-threads-in-mono-for-android-applications/
+			throw new NotImplementedException();
 #else
 			IWin32Window wnd = null;
 			try
@@ -206,7 +244,7 @@ namespace KeePassLib.Utility
 #endif
 		}
 
-#if !KeePassLibSD
+#if !KeePassLibSD && !KeePassLibAndroid
 		internal delegate DialogResult SafeShowMessageBoxInternalDelegate(IWin32Window iParent,
 			string strText, string strTitle, MessageBoxButtons mb, MessageBoxIcon mi,
 			MessageBoxDefaultButton mdb);
@@ -283,11 +321,13 @@ namespace KeePassLib.Utility
 
 			try
 			{
-#if !KeePassLibSD
-				Clipboard.Clear();
-				Clipboard.SetText(ObjectsToMessage(vLines, true));
-#else
+#if KeePassLibSD
 				Clipboard.SetDataObject(ObjectsToMessage(vLines, true));
+#elif KeePassLibAndroid
+				// nicht benoetigt - hoffentlich :-)
+#else
+				Clipboard.Clear();
+				Clipboard.SetText(ObjectsToMessage(vLines, true));				
 #endif
 			}
 			catch(Exception) { Debug.Assert(false); }

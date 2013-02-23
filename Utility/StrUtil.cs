@@ -1,6 +1,8 @@
-﻿/*
+/*
   KeePass Password Safe - The Open-Source Password Manager
   Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  
+  Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -990,6 +992,9 @@ namespace KeePassLib.Utility
 
 			try
 			{
+#if KeePassLibAndroid
+				throw new NotSupportedException();
+#else
 				byte[] pbPlain = StrUtil.Utf8.GetBytes(strPlainText);
 				byte[] pbEnc = ProtectedData.Protect(pbPlain, m_pbOptEnt,
 					DataProtectionScope.CurrentUser);
@@ -998,6 +1003,7 @@ namespace KeePassLib.Utility
 				return Convert.ToBase64String(pbEnc, Base64FormattingOptions.None);
 #else
 				return Convert.ToBase64String(pbEnc);
+#endif
 #endif
 			}
 			catch(Exception) { Debug.Assert(false); }
@@ -1012,10 +1018,14 @@ namespace KeePassLib.Utility
 			try
 			{
 				byte[] pbEnc = Convert.FromBase64String(strCipherText);
+#if KeePassLibAndroid
+				throw new NotSupportedException();
+#else
 				byte[] pbPlain = ProtectedData.Unprotect(pbEnc, m_pbOptEnt,
 					DataProtectionScope.CurrentUser);
 
 				return StrUtil.Utf8.GetString(pbPlain, 0, pbPlain.Length);
+#endif
 			}
 			catch(Exception) { Debug.Assert(false); }
 

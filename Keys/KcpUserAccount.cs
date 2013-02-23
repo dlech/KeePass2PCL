@@ -1,6 +1,8 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
   Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  
+  Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -59,6 +61,9 @@ namespace KeePassLib.Keys
 		/// </summary>
 		public KcpUserAccount()
 		{
+#if KeePassLibAndroid
+			throw new NotSupportedException("DataProtection not supported on MonoForAndroid!");
+#else
 			// Test if ProtectedData is supported -- throws an exception
 			// when running on an old system (Windows 98 / ME).
 			byte[] pbDummyData = new byte[128];
@@ -71,6 +76,7 @@ namespace KeePassLib.Keys
 
 			m_pbKeyData = new ProtectedBinary(true, pbKey);
 			Array.Clear(pbKey, 0, pbKey.Length);
+#endif
 		}
 
 		// public void Clear()
@@ -100,6 +106,9 @@ namespace KeePassLib.Keys
 #if !KeePassLibSD
 			try
 			{
+#if KeePassLibAndroid
+				throw new NotSupportedException("DataProtection not supported on MonoForAndroid!");
+#else
 				string strFilePath = GetUserKeyFilePath(false);
 				byte[] pbProtectedKey = File.ReadAllBytes(strFilePath);
 
@@ -107,6 +116,7 @@ namespace KeePassLib.Keys
 					DataProtectionScope.CurrentUser);
 
 				Array.Clear(pbProtectedKey, 0, pbProtectedKey.Length);
+#endif
 			}
 			catch(Exception exLoad)
 			{
@@ -126,6 +136,9 @@ namespace KeePassLib.Keys
 #if !KeePassLibSD
 			try
 			{
+#if KeePassLibAndroid
+				throw new NotSupportedException("DataProtection not supported on MonoForAndroid!");
+#else
 				string strFilePath = GetUserKeyFilePath(true);
 
 				byte[] pbRandomKey = CryptoRandom.Instance.GetRandomBytes(64);
@@ -138,6 +151,7 @@ namespace KeePassLib.Keys
 				Array.Clear(pbRandomKey, 0, pbRandomKey.Length);
 
 				pbKey = LoadUserKey(true);
+#endif
 			}
 			catch(Exception) { pbKey = null; }
 #endif
