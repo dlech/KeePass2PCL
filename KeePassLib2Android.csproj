@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;KeePassLibAndroid</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;KeePassLibAndroid</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
@@ -114,6 +114,7 @@
     <Compile Include="Security\XorredBuffer.cs" />
     <Compile Include="Security\ProtectedBinary.cs" />
     <Compile Include="Security\ProtectedString.cs" />
+    <Compile Include="Serialization\AsynchronousBufferedXmlReader.cs" />
     <Compile Include="Serialization\BinaryReaderEx.cs" />
     <Compile Include="Serialization\FileLock.cs" />
     <Compile Include="Serialization\FileTransactionEx.cs" />
