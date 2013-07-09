@@ -82,7 +82,7 @@ namespace KeePassLib.Serialization
 				BinaryReaderEx brDecrypted = null;
 				Stream readerStream = null;
 
-				if(kdbFormat == KdbxFormat.Default || kdbFormat == KdbxFormat.ProtocolBuffers)
+				if(kdbFormat == KdbxFormat.Default)
 				{
 					br = new BinaryReaderEx(hashedStream, encNoBom, KLRes.FileCorrupted);
 					ReadHeader(br);
@@ -91,11 +91,17 @@ namespace KeePassLib.Serialization
 					if((sDecrypted == null) || (sDecrypted == hashedStream))
 						throw new SecurityException(KLRes.CryptoStreamFailed);
 
+					if (m_slLogger != null)
+						m_slLogger.SetText("KP2AKEY_TransformingKey", LogStatusType.AdditionalInfo);
+
 					brDecrypted = new BinaryReaderEx(sDecrypted, encNoBom, KLRes.FileCorrupted);
 					byte[] pbStoredStartBytes = brDecrypted.ReadBytes(32);
 
 					if((m_pbStreamStartBytes == null) || (m_pbStreamStartBytes.Length != 32))
 						throw new InvalidDataException();
+
+					if (m_slLogger != null)
+						m_slLogger.SetText("KP2AKEY_DecodingDatabase", LogStatusType.AdditionalInfo);
 
 					for(int iStart = 0; iStart < 32; ++iStart)
 					{
@@ -126,22 +132,10 @@ namespace KeePassLib.Serialization
 						m_pbProtectedStreamKey);
 				}
 				else m_randomStream = null; // No random stream for plain-text files
-
-				var stopWatch = Stopwatch.StartNew();
-				
-				if (kdbFormat == KdbxFormat.ProtocolBuffers)
-				{
-					KdbpFile.ReadDocument(m_pwDatabase, readerStream, m_pbProtectedStreamKey, m_pbHashOfHeader);
-
-					System.Diagnostics.Debug.WriteLine(String.Format("KdbpFile.ReadDocument: {0}ms", stopWatch.ElapsedMilliseconds));
-
-				}
-				else
-				{
-					ReadXmlStreamed(readerStream, hashedStream);
-
-					System.Diagnostics.Debug.WriteLine(String.Format("ReadXmlStreamed: {0}ms", stopWatch.ElapsedMilliseconds));
-				}
+				if (m_slLogger != null)
+					m_slLogger.SetText("KP2AKEY_ParsingDatabase", LogStatusType.AdditionalInfo);
+				ReadXmlStreamed(readerStream, hashedStream);
+				// ReadXmlDom(readerStream);
 
 				readerStream.Close();
 				// GC.KeepAlive(br);
@@ -152,17 +146,6 @@ namespace KeePassLib.Serialization
 				throw new CryptographicException(KLRes.FileCorrupted);
 			}
 			finally { CommonCleanUpRead(sSource, hashedStream); }
-		}
-
-		public static void CopyStream(Stream input, Stream output)
-		{
-			byte[] buffer = new byte[4096];
-			int read;
-			while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-			{
-				output.Write(buffer, 0, read);
-			}
-			output.Seek(0, SeekOrigin.Begin);
 		}
 
 		private void CommonCleanUpRead(Stream sSource, HashingStreamEx hashedStream)
@@ -336,7 +319,8 @@ namespace KeePassLib.Serialization
 			if(m_pbMasterSeed.Length != 32)
 				throw new FormatException(KLRes.MasterSeedLengthInvalid);
 			ms.Write(m_pbMasterSeed, 0, 32);
-
+			if (m_slLogger != null)
+				m_slLogger.SetText("KP2AKEY_TransformingKey", LogStatusType.AdditionalInfo);
 			byte[] pKey32 = m_pwDatabase.MasterKey.GenerateKey32(m_pbTransformSeed,
 				m_pwDatabase.KeyEncryptionRounds).ReadData();
 			if((pKey32 == null) || (pKey32.Length != 32))
