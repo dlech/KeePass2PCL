@@ -20,10 +20,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.Diagnostics;
 using System.Reflection;
+#if !KeePassLibMac
+using System.Windows.Forms;
+#endif
 
 namespace KeePassLib.Translation
 {
@@ -66,7 +68,7 @@ namespace KeePassLib.Translation
 			}
 		}
 
-#if (!KeePassLibSD && !KeePassRT)
+#if !(KeePassLibSD || KeePassRT || KeePassLibMac)
 		private Form m_formEnglish = null;
 		[XmlIgnore]
 		public Form FormEnglish

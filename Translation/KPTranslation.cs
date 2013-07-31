@@ -23,10 +23,12 @@ using System.Text;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Windows.Forms;
 using System.ComponentModel;
 using System.Drawing;
 using System.Diagnostics;
+#if !KeePassLibMac
+using System.Windows.Forms;
+#endif
 
 using KeePassLib.Interfaces;
 using KeePassLib.Utility;
@@ -153,7 +155,7 @@ namespace KeePassLib.Translation
 			return new Dictionary<string, string>();
 		}
 
-#if (!KeePassLibSD && !KeePassRT)
+#if !(KeePassLibSD || KeePassRT || KeePassLibMac)
 		public void ApplyTo(Form form)
 		{
 			if(form == null) throw new ArgumentNullException("form");

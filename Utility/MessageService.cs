@@ -21,8 +21,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
-using System.Windows.Forms;
 using System.Diagnostics;
+#if KeePassLibMac
+using MonoMac.AppKit;
+#else
+using System.Windows.Forms;
+#endif
 
 using KeePassLib.Resources;
 using KeePassLib.Serialization;
@@ -33,16 +37,32 @@ namespace KeePassLib.Utility
 	{
 		private string m_strTitle = string.Empty;
 		private string m_strText = string.Empty;
+#if KeePassLibMac
+		private NSAlertStyle m_alertStyle;
+#else
 		private MessageBoxButtons m_msgButtons = MessageBoxButtons.OK;
 		private MessageBoxIcon m_msgIcon = MessageBoxIcon.None;
-
+#endif
 		public string Title { get { return m_strTitle; } }
 		public string Text { get { return m_strText; } }
+#if KeePassLibMac
+		public NSAlertStyle AlertStyle { get { return m_alertStyle; } }
+#else
 		public MessageBoxButtons Buttons { get { return m_msgButtons; } }
 		public MessageBoxIcon Icon { get { return m_msgIcon; } }
-
+#endif
 		public MessageServiceEventArgs() { }
 
+		
+#if KeePassLibMac
+		public MessageServiceEventArgs(string strTitle, string strText,
+			NSAlertStyle style)
+		{
+			m_strTitle = (strTitle ?? string.Empty);
+			m_strText = (strText ?? string.Empty);
+			m_alertStyle = style;
+		}
+#else
 		public MessageServiceEventArgs(string strTitle, string strText,
 			MessageBoxButtons msgButtons, MessageBoxIcon msgIcon)
 		{
@@ -51,25 +71,32 @@ namespace KeePassLib.Utility
 			m_msgButtons = msgButtons;
 			m_msgIcon = msgIcon;
 		}
+#endif 
 	}
 
 	public static class MessageService
 	{
 		private static volatile uint m_uCurrentMessageCount = 0;
 
-#if !KeePassLibSD
+#if KeePassLibMac
+		private const NSAlertStyle m_mbiInfo = NSAlertStyle.Informational;
+		private const NSAlertStyle m_mbiWarning = NSAlertStyle.Warning;
+		private const NSAlertStyle m_mbiFatal = NSAlertStyle.Critical;
+#elif KeePassLibSD
+		private const MessageBoxIcon m_mbiInfo = MessageBoxIcon.Asterisk;
+		private const MessageBoxIcon m_mbiWarning = MessageBoxIcon.Exclamation;
+		private const MessageBoxIcon m_mbiFatal = MessageBoxIcon.Hand;
+#else
 		private const MessageBoxIcon m_mbiInfo = MessageBoxIcon.Information;
 		private const MessageBoxIcon m_mbiWarning = MessageBoxIcon.Warning;
 		private const MessageBoxIcon m_mbiFatal = MessageBoxIcon.Error;
 
 		private const MessageBoxOptions m_mboRtl = (MessageBoxOptions.RtlReading |
 			MessageBoxOptions.RightAlign);
-#else
-		private const MessageBoxIcon m_mbiInfo = MessageBoxIcon.Asterisk;
-		private const MessageBoxIcon m_mbiWarning = MessageBoxIcon.Exclamation;
-		private const MessageBoxIcon m_mbiFatal = MessageBoxIcon.Hand;
 #endif
+#if !KeePassLibMac
 		private const MessageBoxIcon m_mbiQuestion = MessageBoxIcon.Question;
+#endif
 
 		public static string NewLine
 		{
@@ -158,7 +185,7 @@ namespace KeePassLib.Utility
 			return sbText.ToString();
 		}
 
-#if (!KeePassLibSD && !KeePassRT)
+#if !(KeePassLibSD || KeePassRT || KeePassLibMac)
 		internal static Form GetTopForm()
 		{
 			FormCollection fc = Application.OpenForms;
@@ -168,10 +195,16 @@ namespace KeePassLib.Utility
 		}
 #endif
 
+#if KeePassLibMac
+		private static void SafeShowMessageBox(string strText, string strTitle, NSAlertStyle style)
+		{
+			throw new NotImplementedException();
+		}
+#else
 		private static DialogResult SafeShowMessageBox(string strText, string strTitle,
 			MessageBoxButtons mb, MessageBoxIcon mi, MessageBoxDefaultButton mdb)
 		{
-#if (KeePassLibSD || KeePassRT)
+#if !KeePassLibMac && (KeePassLibSD || KeePassRT)
 			return MessageBox.Show(strText, strTitle, mb, mi, mdb);
 #else
 			IWin32Window wnd = null;
@@ -202,11 +235,12 @@ namespace KeePassLib.Utility
 
 			if(StrUtil.RightToLeft)
 				return MessageBox.Show(strText, strTitle, mb, mi, mdb, m_mboRtl);
-			return MessageBox.Show(strText, strTitle, mb, mi, mdb);
+			return MessageBox.Show(strText, strTitle, mb, mi, mdb);		
 #endif
 		}
+#endif
 
-#if (!KeePassLibSD && !KeePassRT)
+#if !(KeePassLibSD || KeePassRT || KeePassLibMac)
 		internal delegate DialogResult SafeShowMessageBoxInternalDelegate(IWin32Window iParent,
 			string strText, string strTitle, MessageBoxButtons mb, MessageBoxIcon mi,
 			MessageBoxDefaultButton mdb);
@@ -233,12 +267,20 @@ namespace KeePassLib.Utility
 			strTitle = (strTitle ?? PwDefs.ShortProductName);
 			string strText = ObjectsToMessage(vLines);
 
+#if KeePassLibMac
+			if(MessageService.MessageShowing != null)
+				MessageService.MessageShowing(null, new MessageServiceEventArgs(
+					strTitle, strText, m_mbiInfo));
+
+			SafeShowMessageBox(strText, strTitle, m_mbiInfo);
+#else
 			if(MessageService.MessageShowing != null)
 				MessageService.MessageShowing(null, new MessageServiceEventArgs(
 					strTitle, strText, MessageBoxButtons.OK, m_mbiInfo));
 
 			SafeShowMessageBox(strText, strTitle, MessageBoxButtons.OK, m_mbiInfo,
 				MessageBoxDefaultButton.Button1);
+#endif
 
 			--m_uCurrentMessageCount;
 		}
@@ -259,14 +301,20 @@ namespace KeePassLib.Utility
 
 			string strTitle = PwDefs.ShortProductName;
 			string strText = ObjectsToMessage(vLines, bFullExceptions);
+#if KeePassLibMac
+			if(MessageService.MessageShowing != null)
+				MessageService.MessageShowing(null, new MessageServiceEventArgs(
+					strTitle, strText, m_mbiWarning));
 
+			SafeShowMessageBox(strText, strTitle, m_mbiWarning);
+#else
 			if(MessageService.MessageShowing != null)
 				MessageService.MessageShowing(null, new MessageServiceEventArgs(
 					strTitle, strText, MessageBoxButtons.OK, m_mbiWarning));
 
 			SafeShowMessageBox(strText, strTitle, MessageBoxButtons.OK, m_mbiWarning,
 				MessageBoxDefaultButton.Button1);
-
+#endif
 			--m_uCurrentMessageCount;
 		}
 
@@ -283,25 +331,35 @@ namespace KeePassLib.Utility
 
 			try
 			{
-#if !KeePassLibSD
+#if KeePassLibMac
+				throw new NotImplementedException();
+#elif KeePassLibSD
+				Clipboard.SetDataObject(ObjectsToMessage(vLines, true));
+#else
 				Clipboard.Clear();
 				Clipboard.SetText(ObjectsToMessage(vLines, true));
-#else
-				Clipboard.SetDataObject(ObjectsToMessage(vLines, true));
 #endif
 			}
 			catch(Exception) { Debug.Assert(false); }
 
+#if KeePassLibMac
+			if(MessageService.MessageShowing != null)
+				MessageService.MessageShowing(null, new MessageServiceEventArgs(
+					strTitle, strText, m_mbiFatal));
+
+			SafeShowMessageBox(strText, strTitle, m_mbiFatal);
+#else
 			if(MessageService.MessageShowing != null)
 				MessageService.MessageShowing(null, new MessageServiceEventArgs(
 					strTitle, strText, MessageBoxButtons.OK, m_mbiFatal));
 
 			SafeShowMessageBox(strText, strTitle, MessageBoxButtons.OK, m_mbiFatal,
-				MessageBoxDefaultButton.Button1);
-
+				MessageBoxDefaultButton.Button1);tton1);
+#endif
 			--m_uCurrentMessageCount;
 		}
-
+		
+#if !KeePassLibMac
 		public static DialogResult Ask(string strText, string strTitle,
 			MessageBoxButtons mbb)
 		{
@@ -340,20 +398,25 @@ namespace KeePassLib.Utility
 			--m_uCurrentMessageCount;
 			return (dr == DialogResult.Yes);
 		}
+#endif
 
 		public static bool AskYesNo(string strText, string strTitle, bool bDefaultToYes)
 		{
+#if KeePassLibMac
+			throw new NotImplementedException ();
+#else
 			return AskYesNo(strText, strTitle, bDefaultToYes, m_mbiQuestion);
+#endif
 		}
 
 		public static bool AskYesNo(string strText, string strTitle)
 		{
-			return AskYesNo(strText, strTitle, true, m_mbiQuestion);
+			return AskYesNo(strText, strTitle, true);
 		}
 
 		public static bool AskYesNo(string strText)
 		{
-			return AskYesNo(strText, null, true, m_mbiQuestion);
+			return AskYesNo(strText, null);
 		}
 
 		public static void ShowLoadWarning(string strFilePath, Exception ex)
