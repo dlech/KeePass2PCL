@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
   
   Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
@@ -89,9 +89,13 @@ namespace KeePassLib.Native
 		{
 			if(m_platID.HasValue) return m_platID.Value;
 
+#if KeePassRT
+			m_platID = PlatformID.Win32NT;
+#else
 			m_platID = Environment.OSVersion.Platform;
+#endif
 
-#if !KeePassLibSD && !KeePassLibAndroid
+#if (!KeePassLibSD && !KeePassRT && !KeePAssLibAndroid)
 			// Mono returns PlatformID.Unix on Mac OS X, workaround this
 			if(m_platID.Value == PlatformID.Unix)
 			{
@@ -104,7 +108,7 @@ namespace KeePassLib.Native
 			return m_platID.Value;
 		}
 
-#if !KeePassLibSD
+#if (!KeePassLibSD && !KeePassRT)
 		public static string RunConsoleApp(string strAppPath, string strParams)
 		{
 			return RunConsoleApp(strAppPath, strParams, null);
@@ -161,6 +165,7 @@ namespace KeePassLib.Native
 		{
 			if(m_bAllowNative == false) return false;
 
+#if KeePassLibAndroid
 			try
 			{
 				Com.Keepassdroid.Crypto.Finalkey.NativeFinalKey key = new Com.Keepassdroid.Crypto.Finalkey.NativeFinalKey();
@@ -174,6 +179,21 @@ namespace KeePassLib.Native
 			}
 
 			return true;
+#else
+			KeyValuePair<IntPtr, IntPtr> kvp = PrepareArrays256(pBuf256, pKey256);
+			bool bResult = false;
+
+			try
+			{
+				bResult = NativeMethods.TransformKey(kvp.Key, kvp.Value, uRounds);
+			}
+			catch(Exception) { bResult = false; }
+
+			if(bResult) GetBuffers256(kvp, pBuf256, pKey256);
+
+			NativeLib.FreeArrays(kvp);
+			return bResult;
+#endif
 		}
 
 		/// <summary>

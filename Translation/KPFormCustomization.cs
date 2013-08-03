@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
   
   Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
@@ -70,6 +70,7 @@ namespace KeePassLib.Translation
 			}
 		}
 
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid)
 		private Form m_formEnglish = null;
 		[XmlIgnore]
 		public Form FormEnglish
@@ -78,7 +79,6 @@ namespace KeePassLib.Translation
 			set { m_formEnglish = value; }
 		}
 
-#if !KeePassLibSD && !KeePassLibAndroid
 		public void ApplyTo(Form form)
 		{
 			Debug.Assert(form != null); if(form == null) throw new ArgumentNullException("form");

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -40,9 +40,12 @@ namespace KeePassLib.Collections
 		IDeepCloneable<ProtectedStringDictionary>,
 		IEnumerable<KeyValuePair<string, ProtectedString>>
 	{
-		/*private SortedDictionary<string, ProtectedString> m_vStrings =
-			new SortedDictionary<string, ProtectedString>();*/
+#if KeePassLibAndroid
 		private Dictionary<string, ProtectedString> m_vStrings = new Dictionary<string, ProtectedString>();
+#else
+		private SortedDictionary<string, ProtectedString> m_vStrings =
+			new SortedDictionary<string, ProtectedString>();
+#endif
 
 		/// <summary>
 		/// Get the number of strings in this entry.

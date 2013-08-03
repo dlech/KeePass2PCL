@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
   
   Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
@@ -149,7 +149,7 @@ namespace KeePassLib.Utility
 
 				Exception exObj = (obj as Exception);
 				string strObj = (obj as string);
-#if !KeePassLibSD
+#if (!KeePassLibSD && !KeePassRT)
 				StringCollection scObj = (obj as StringCollection);
 #endif
 
@@ -160,7 +160,7 @@ namespace KeePassLib.Utility
 					else if((exObj.Message != null) && (exObj.Message.Length > 0))
 						strAppend = exObj.Message;
 				}
-#if !KeePassLibSD
+#if (!KeePassLibSD && !KeePassRT)
 				else if(scObj != null)
 				{
 					StringBuilder sb = new StringBuilder();
@@ -189,7 +189,7 @@ namespace KeePassLib.Utility
 			return sbText.ToString();
 		}
 
-#if !KeePassLibSD && !KeePassLibAndroid
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid)
 		internal static Form GetTopForm()
 		{
 			FormCollection fc = Application.OpenForms;
@@ -202,7 +202,7 @@ namespace KeePassLib.Utility
 		private static DialogResult SafeShowMessageBox(string strText, string strTitle,
 			MessageBoxButtons mb, MessageBoxIcon mi, MessageBoxDefaultButton mdb)
 		{
-#if KeePassLibSD
+#if (KeePassLibSD || KeePassRT)
 			return MessageBox.Show(strText, strTitle, mb, mi, mdb);
 #elif KeePassLibAndroid
 			if (mb == MessageBoxButtons.OK)
@@ -244,7 +244,7 @@ namespace KeePassLib.Utility
 #endif
 		}
 
-#if !KeePassLibSD && !KeePassLibAndroid
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid)
 		internal delegate DialogResult SafeShowMessageBoxInternalDelegate(IWin32Window iParent,
 			string strText, string strTitle, MessageBoxButtons mb, MessageBoxIcon mi,
 			MessageBoxDefaultButton mdb);
@@ -361,7 +361,8 @@ namespace KeePassLib.Utility
 			return dr;
 		}
 
-		public static bool AskYesNo(string strText, string strTitle, bool bDefaultToYes)
+		public static bool AskYesNo(string strText, string strTitle, bool bDefaultToYes,
+			MessageBoxIcon mbi)
 		{
 			++m_uCurrentMessageCount;
 
@@ -370,24 +371,29 @@ namespace KeePassLib.Utility
 
 			if(MessageService.MessageShowing != null)
 				MessageService.MessageShowing(null, new MessageServiceEventArgs(
-					strTitleEx, strTextEx, MessageBoxButtons.YesNo, m_mbiQuestion));
+					strTitleEx, strTextEx, MessageBoxButtons.YesNo, mbi));
 
 			DialogResult dr = SafeShowMessageBox(strTextEx, strTitleEx,
-				MessageBoxButtons.YesNo, m_mbiQuestion, bDefaultToYes ?
+				MessageBoxButtons.YesNo, mbi, bDefaultToYes ?
 				MessageBoxDefaultButton.Button1 : MessageBoxDefaultButton.Button2);
 
 			--m_uCurrentMessageCount;
 			return (dr == DialogResult.Yes);
 		}
 
+		public static bool AskYesNo(string strText, string strTitle, bool bDefaultToYes)
+		{
+			return AskYesNo(strText, strTitle, bDefaultToYes, m_mbiQuestion);
+		}
+
 		public static bool AskYesNo(string strText, string strTitle)
 		{
-			return AskYesNo(strText, strTitle, true);
+			return AskYesNo(strText, strTitle, true, m_mbiQuestion);
 		}
 
 		public static bool AskYesNo(string strText)
 		{
-			return AskYesNo(strText, null, true);
+			return AskYesNo(strText, null, true, m_mbiQuestion);
 		}
 
 		public static void ShowLoadWarning(string strFilePath, Exception ex)

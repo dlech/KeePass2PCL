@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -40,14 +40,13 @@ namespace KeePassLib.Collections
 		IDeepCloneable<ProtectedBinaryDictionary>,
 		IEnumerable<KeyValuePair<string, ProtectedBinary>>
 	{
-		/*
-		private SortedDictionary<string, ProtectedBinary> m_vBinaries =
-			new SortedDictionary<string, ProtectedBinary>();
-		*/
-
+#if KeePassLibAndroid
 		private Dictionary<string, ProtectedBinary> m_vBinaries =
 			new Dictionary<string, ProtectedBinary>();
-
+#else
+		private SortedDictionary<string, ProtectedBinary> m_vBinaries =
+			new SortedDictionary<string, ProtectedBinary>();
+#endif
 
 		/// <summary>
 		/// Get the number of binaries in this entry.

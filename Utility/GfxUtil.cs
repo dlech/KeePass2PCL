@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
   
   Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
@@ -28,18 +28,22 @@ using System.Diagnostics;
 #if KeePassLibAndroid
 using Android.Graphics;
 #else
-using System.Windows.Forms;
+using System.Windows.Imaging;
 #endif
 
 namespace KeePassLib.Utility
 {
 	public static class GfxUtil
 	{
-#if KeePassLibAndroid
-		public static Android.Graphics.Bitmap LoadImage(byte[] pb)
-#else
+#if KeePassRT
 		public static Image LoadImage(byte[] pb)
-#endif
+		{
+			MemoryStream ms = new MemoryStream(pb, false);
+			try { return Image.FromStream(ms); }
+			finally { ms.Close(); }
+		}
+#elif KeePassLibAndroid
+		public static Android.Graphics.Bitmap LoadImage(byte[] pb)
 		{
 			if(pb == null) throw new ArgumentNullException("pb");
 
@@ -47,24 +51,39 @@ namespace KeePassLib.Utility
 			try { return LoadImagePriv(ms); }
 			catch(Exception)
 			{
-#if KeePassLibAndroid
 				Android.Graphics.Bitmap imgIco = TryLoadIco(pb);
-#else
-				Image imgIco = TryLoadIco(pb);
-#endif
 				if(imgIco != null) return imgIco;
 				throw;
 			}
 			finally { ms.Close(); }
 		}
 
-#if KeePassLibAndroid
 		private static Android.Graphics.Bitmap LoadImagePriv(Stream s)
 		{
 			Android.Graphics.Bitmap img = BitmapFactory.DecodeStream(s);
 			return img;			
 		}
+
+		private static Android.Graphics.Bitmap TryLoadIco(byte[] pb)
+		{
+			throw new NotImplementedException();
+		}
 #else
+		public static Image LoadImage(byte[] pb)
+		{
+			if(pb == null) throw new ArgumentNullException("pb");
+
+			MemoryStream ms = new MemoryStream(pb, false);
+			try { return LoadImagePriv(ms); }
+			catch(Exception)
+			{
+				Image imgIco = TryLoadIco(pb);
+				if(imgIco != null) return imgIco;
+				throw;
+			}
+			finally { ms.Close(); }
+		}
+
 		private static Image LoadImagePriv(Stream s)
 		{
 			// Image.FromStream wants the stream to be open during
@@ -75,31 +94,32 @@ namespace KeePassLib.Utility
 			{
 #if !KeePassLibSD
 				imgSrc = Image.FromStream(s);
-				Image img = new Bitmap(imgSrc.Width, imgSrc.Height,
+				Bitmap bmp = new Bitmap(imgSrc.Width, imgSrc.Height,
 					PixelFormat.Format32bppArgb);
+
+				try
+				{
+					bmp.SetResolution(imgSrc.HorizontalResolution,
+						imgSrc.VerticalResolution);
+					Debug.Assert(bmp.Size == imgSrc.Size);
+				}
+				catch(Exception) { Debug.Assert(false); }
 #else
 				imgSrc = new Bitmap(s);
-				Image img = new Bitmap(imgSrc.Width, imgSrc.Height);
+				Bitmap bmp = new Bitmap(imgSrc.Width, imgSrc.Height);
 #endif
 
-				using(Graphics g = Graphics.FromImage(img))
+				using(Graphics g = Graphics.FromImage(bmp))
 				{
 					g.Clear(Color.Transparent);
 					g.DrawImage(imgSrc, 0, 0);
 				}
 
-				return img;
+				return bmp;
 			}
 			finally { if(imgSrc != null) imgSrc.Dispose(); }
 		}
-#endif
 
-#if KeePassLibAndroid
-		private static Android.Graphics.Bitmap TryLoadIco(byte[] pb)
-		{
-			throw new NotImplementedException();
-		}
-#else
 		private static Image TryLoadIco(byte[] pb)
 		{
 #if !KeePassLibSD

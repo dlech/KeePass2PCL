@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -442,7 +442,9 @@ namespace KeePassLib
 		{
 			Debug.Assert(pgTemplate != null); if(pgTemplate == null) throw new ArgumentNullException("pgTemplate");
 
-			if(bOnlyIfNewer && (pgTemplate.LastModificationTime < LastModificationTime)) return;
+			if(bOnlyIfNewer && (TimeUtil.Compare(pgTemplate.LastModificationTime, LastModificationTime,
+				true) < 0))
+				return;
 
 			// Template UUID should be the same as the current one
 			Debug.Assert(m_uuid.EqualsValue(pgTemplate.m_uuid));
@@ -820,9 +822,15 @@ namespace KeePassLib
 			Regex rx = null;
 			if(sp.RegularExpression)
 			{
+#if KeePassRT
+				RegexOptions ro = RegexOptions.None;
+#else
 				RegexOptions ro = RegexOptions.Compiled;
+#endif
 				if((sp.ComparisonMode == StringComparison.CurrentCultureIgnoreCase) ||
+#if !KeePassRT
 					(sp.ComparisonMode == StringComparison.InvariantCultureIgnoreCase) ||
+#endif
 					(sp.ComparisonMode == StringComparison.OrdinalIgnoreCase))
 				{
 					ro |= RegexOptions.IgnoreCase;
@@ -984,7 +992,7 @@ namespace KeePassLib
 					{
 						// Start 10% before actual data, and don't run over
 						var startPos = Math.Min(matchPos - (SearchContextStringMaxLength / 10), contextString.Length - SearchContextStringMaxLength);
-						contextString = "… " + contextString.Substring(startPos, SearchContextStringMaxLength) + ((startPos + SearchContextStringMaxLength < contextString.Length) ? " …" : null);
+						contextString = "Ã– " + contextString.Substring(startPos, SearchContextStringMaxLength) + ((startPos + SearchContextStringMaxLength < contextString.Length) ? " Ã–" : null);
 					}
 					resultContexts[pe.Uuid] = contextFieldName + ": " + contextString;
 				}
@@ -1024,6 +1032,30 @@ namespace KeePassLib
 			if(bSort) vTags.Sort(StrUtil.CaseIgnoreComparer);
 			return vTags;
 		}
+
+#if !KeePassLibSD
+		public IDictionary<string, uint> BuildEntryTagsDict(bool bSort)
+		{
+			IDictionary<string, uint> d;
+			if(!bSort) d = new Dictionary<string, uint>(StrUtil.CaseIgnoreComparer);
+			else d = new SortedDictionary<string, uint>(StrUtil.CaseIgnoreComparer);
+
+			EntryHandler eh = delegate(PwEntry pe)
+			{
+				foreach(string strTag in pe.Tags)
+				{
+					uint u;
+					if(d.TryGetValue(strTag, out u)) d[strTag] = u + 1;
+					else d[strTag] = 1;
+				}
+
+				return true;
+			};
+
+			TraverseTree(TraversalMethod.PreOrder, null, eh);
+			return d;
+		}
+#endif
 
 		public void FindEntriesByTag(string strTag, PwObjectList<PwEntry> listStorage,
 			bool bSearchRecursive)
@@ -1238,6 +1270,7 @@ namespace KeePassLib
 			}
 		}
 
+#if !KeePassLibSD
 		/// <summary>
 		/// Find/create a subtree of groups.
 		/// </summary>
@@ -1252,10 +1285,22 @@ namespace KeePassLib
 		public PwGroup FindCreateSubTree(string strTree, char[] vSeparators,
 			bool bAllowCreate)
 		{
+			if(vSeparators == null) { Debug.Assert(false); vSeparators = new char[0]; }
+
+			string[] v = new string[vSeparators.Length];
+			for(int i = 0; i < vSeparators.Length; ++i)
+				v[i] = new string(vSeparators[i], 1);
+
+			return FindCreateSubTree(strTree, v, bAllowCreate);
+		}
+
+		public PwGroup FindCreateSubTree(string strTree, string[] vSeparators,
+			bool bAllowCreate)
+		{
 			Debug.Assert(strTree != null); if(strTree == null) return this;
 			if(strTree.Length == 0) return this;
 
-			string[] vGroups = strTree.Split(vSeparators);
+			string[] vGroups = strTree.Split(vSeparators, StringSplitOptions.None);
 			if((vGroups == null) || (vGroups.Length == 0)) return this;
 
 			PwGroup pgContainer = this;
@@ -1286,6 +1331,7 @@ namespace KeePassLib
 
 			return pgContainer;
 		}
+#endif
 
 		/// <summary>
 		/// Get the level of the group (i.e. the number of parent groups).

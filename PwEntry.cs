@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -533,7 +533,9 @@ namespace KeePassLib
 		{
 			Debug.Assert(peTemplate != null); if(peTemplate == null) throw new ArgumentNullException("peTemplate");
 
-			if(bOnlyIfNewer && (peTemplate.LastModificationTime < LastModificationTime)) return;
+			if(bOnlyIfNewer && (TimeUtil.Compare(peTemplate.LastModificationTime, LastModificationTime,
+				true) < 0))
+				return;
 
 			// Template UUID should be the same as the current one
 			Debug.Assert(m_uuid.EqualsValue(peTemplate.m_uuid));
@@ -731,7 +733,7 @@ namespace KeePassLib
 			for(uint u = 0; u < m_listHistory.UCount; ++u)
 			{
 				PwEntry pe = m_listHistory.GetAt(u);
-				if(pe.LastModificationTime < dtMin)
+				if(TimeUtil.Compare(pe.LastModificationTime, dtMin, true) < 0)
 				{
 					idxRemove = u;
 					dtMin = pe.LastModificationTime;
@@ -917,7 +919,13 @@ namespace KeePassLib
 			string strB = b.Strings.ReadSafe(m_strFieldName);
 
 			if(m_bCompareNaturally) return StrUtil.CompareNaturally(strA, strB);
+
+#if KeePassRT
+			return string.Compare(strA, strB, m_bCaseInsensitive ?
+				StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture);
+#else
 			return string.Compare(strA, strB, m_bCaseInsensitive);
+#endif
 		}
 	}
 }

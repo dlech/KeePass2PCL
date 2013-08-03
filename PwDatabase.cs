@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
   
   Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
@@ -562,7 +562,7 @@ namespace KeePassLib
 		/// Open a database. The URL may point to any supported data source.
 		/// </summary>
 		/// <param name="ioSource">IO connection to load the database from.</param>
-		/// s<param name="pwKey">Key used to open the specified database.</param>
+		/// <param name="pwKey">Key used to open the specified database.</param>
 		/// <param name="slLogger">Logger, which gets all status messages.</param>
 		public void Open(IOConnectionInfo ioSource, CompositeKey pwKey,
 			IStatusLogger slLogger)
@@ -587,9 +587,9 @@ namespace KeePassLib
 			if (fileNameWithoutPathAndExt == null) throw new ArgumentException("fileNameWithoutPathAndExt");
 			Debug.Assert(pwKey != null);
 			Debug.Assert(ioSource != null);
-			if (ioSource == null) throw new ArgumentNullException("ioSource");
-			
-			if (pwKey == null) throw new ArgumentNullException("pwKey");
+			if(ioSource == null) throw new ArgumentNullException("ioSource");
+			Debug.Assert(pwKey != null);
+			if(pwKey == null) throw new ArgumentNullException("pwKey");
 
 			Close();
 
@@ -644,7 +644,7 @@ namespace KeePassLib
 				kdb.Save(s, null, KdbxFormat.Default, slLogger);
 
 				ft.CommitWrite();
-				
+
 				m_pbHashOfLastIO = kdb.HashOfFileOnDisk;
 				m_pbHashOfFileOnDisk = kdb.HashOfFileOnDisk;
 				Debug.Assert(m_pbHashOfFileOnDisk != null);
@@ -816,12 +816,12 @@ namespace KeePassLib
 
 					bool bOrgBackup = !bEquals;
 					if(mm != PwMergeMethod.OverwriteExisting)
-						bOrgBackup &= (pe.LastModificationTime > peLocal.LastModificationTime);
+						bOrgBackup &= (TimeUtil.CompareLastMod(pe, peLocal, true) > 0);
 					bOrgBackup &= !pe.HasBackupOfData(peLocal, false, true);
 					if(bOrgBackup) peLocal.CreateBackup(null); // Maintain at end
 
 					bool bSrcBackup = !bEquals && (mm != PwMergeMethod.OverwriteExisting);
-					bSrcBackup &= (peLocal.LastModificationTime > pe.LastModificationTime);
+					bSrcBackup &= (TimeUtil.CompareLastMod(peLocal, pe, true) > 0);
 					bSrcBackup &= !peLocal.HasBackupOfData(pe, false, true);
 					if(bSrcBackup) pe.CreateBackup(null); // Maintain at end
 
@@ -908,8 +908,11 @@ namespace KeePassLib
 				foreach(PwDeletedObject pdo in listDelObjects)
 				{
 					if(pg.Uuid.EqualsValue(pdo.Uuid))
-						if(pg.LastModificationTime < pdo.DeletionTime)
+					{
+						if(TimeUtil.Compare(pg.LastModificationTime,
+							pdo.DeletionTime, true) < 0)
 							listGroupsToDelete.AddLast(pg);
+					}
 				}
 
 				return ((m_slStatus != null) ? m_slStatus.ContinueWork() : true);
@@ -920,8 +923,11 @@ namespace KeePassLib
 				foreach(PwDeletedObject pdo in listDelObjects)
 				{
 					if(pe.Uuid.EqualsValue(pdo.Uuid))
-						if(pe.LastModificationTime < pdo.DeletionTime)
+					{
+						if(TimeUtil.Compare(pe.LastModificationTime,
+							pdo.DeletionTime, true) < 0)
 							listEntriesToDelete.AddLast(pe);
+					}
 				}
 
 				return ((m_slStatus != null) ? m_slStatus.ContinueWork() : true);
@@ -1360,25 +1366,30 @@ namespace KeePassLib
 
 			if((m_slStatus != null) && !m_slStatus.ContinueWork()) return;
 
-			SortedList<DateTime, PwEntry> list = new SortedList<DateTime, PwEntry>();
+			IDictionary<DateTime, PwEntry> dict =
+#if KeePassLibSD
+				new SortedList<DateTime, PwEntry>();
+#else
+				new SortedDictionary<DateTime, PwEntry>();
+#endif
 			foreach(PwEntry peOrg in pe.History)
 			{
-				list[peOrg.LastModificationTime] = peOrg;
+				dict[peOrg.LastModificationTime] = peOrg;
 			}
 
 			foreach(PwEntry peSrc in peSource.History)
 			{
 				DateTime dt = peSrc.LastModificationTime;
-				if(list.ContainsKey(dt))
+				if(dict.ContainsKey(dt))
 				{
 					if(mm == PwMergeMethod.OverwriteExisting)
-						list[dt] = peSrc.CloneDeep();
+						dict[dt] = peSrc.CloneDeep();
 				}
-				else list[dt] = peSrc.CloneDeep();
+				else dict[dt] = peSrc.CloneDeep();
 			}
 
 			pe.History.Clear();
-			foreach(KeyValuePair<DateTime, PwEntry> kvpCur in list)
+			foreach(KeyValuePair<DateTime, PwEntry> kvpCur in dict)
 			{
 				Debug.Assert(kvpCur.Value.Uuid.EqualsValue(pe.Uuid));
 				Debug.Assert(kvpCur.Value.History.UCount == 0);
@@ -1422,17 +1433,31 @@ namespace KeePassLib
 		/// <returns>Index of the icon.</returns>
 		public int GetCustomIconIndex(PwUuid pwIconId)
 		{
-			int nIndex = 0;
-
-			foreach(PwCustomIcon pwci in m_vCustomIcons)
+			for(int i = 0; i < m_vCustomIcons.Count; ++i)
 			{
+				PwCustomIcon pwci = m_vCustomIcons[i];
 				if(pwci.Uuid.EqualsValue(pwIconId))
-					return nIndex;
-
-				++nIndex;
+					return i;
 			}
 
 			// Debug.Assert(false); // Do not assert
+			return -1;
+		}
+
+		public int GetCustomIconIndex(byte[] pbPngData)
+		{
+			if(pbPngData == null) { Debug.Assert(false); return -1; }
+
+			for(int i = 0; i < m_vCustomIcons.Count; ++i)
+			{
+				PwCustomIcon pwci = m_vCustomIcons[i];
+				byte[] pbEx = pwci.ImageDataPng;
+				if(pbEx == null) { Debug.Assert(false); continue; }
+
+				if(MemUtil.ArraysEqual(pbEx, pbPngData))
+					return i;
+			}
+
 			return -1;
 		}
 
@@ -1632,7 +1657,7 @@ namespace KeePassLib
 					PwEntry peB = l.GetAt(j);
 					if(!DupEntriesEqual(peA, peB)) continue;
 
-					bool bDeleteA = (peA.LastModificationTime <= peB.LastModificationTime);
+					bool bDeleteA = (TimeUtil.CompareLastMod(peA, peB, true) <= 0);
 					if(pgRecycleBin != null)
 					{
 						bool bAInBin = peA.IsContainedIn(pgRecycleBin);

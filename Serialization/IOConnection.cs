@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
   
   Modified to be used with Mono for Android. Changes Copyright (C) 2013 Philipp Crocoll
 
@@ -24,21 +24,26 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using System.Diagnostics;
 
-#if !KeePassLibSD
+#if (!KeePassLibSD && !KeePassRT)
 using System.Net.Cache;
 using System.Net.Security;
 #endif
 
+#if !KeePassRT
+using System.Security.Cryptography.X509Certificates;
+#endif
+
 using KeePassLib.Native;
 using KeePassLib.Utility;
+#if KeePassLibAndroid
 using keepass2android;
+#endif
 
 namespace KeePassLib.Serialization
 {
-#if !KeePassLibSD
+#if (!KeePassLibSD && !KeePassRT)
 	public sealed class IOWebClient : WebClient
 	{
 		protected override WebRequest GetWebRequest(Uri address)
@@ -52,12 +57,19 @@ namespace KeePassLib.Serialization
 
 	public static class IOConnection
 	{
-#if !KeePassLibSD
+#if (!KeePassLibSD && !KeePassRT)
 		private static ProxyServerType m_pstProxyType = ProxyServerType.System;
 		private static string m_strProxyAddr = string.Empty;
 		private static string m_strProxyPort = string.Empty;
 		private static string m_strProxyUserName = string.Empty;
 		private static string m_strProxyPassword = string.Empty;
+
+		private static bool m_bSslCertsAcceptInvalid = false;
+		internal static bool SslCertsAcceptInvalid
+		{
+			get { return m_bSslCertsAcceptInvalid; }
+			set { m_bSslCertsAcceptInvalid = value; }
+		}
 #endif
 
 		// Web request methods
@@ -67,16 +79,18 @@ namespace KeePassLib.Serialization
 		// Web request headers
 		public const string WrhMoveFileTo = "MoveFileTo";
 
-#if !KeePassLibSD
+		public static event EventHandler<IOAccessEventArgs> IOAccessPre;
+
+#if (!KeePassLibSD && !KeePassRT)
 		// Allow self-signed certificates, expired certificates, etc.
-		private static bool ValidateServerCertificate(object sender,
+		private static bool AcceptCertificate(object sender,
 			X509Certificate certificate, X509Chain chain,
 			SslPolicyErrors sslPolicyErrors)
 		{
 			return true;
 		}
 
-		public static void SetProxy(ProxyServerType pst, string strAddr,
+		internal static void SetProxy(ProxyServerType pst, string strAddr,
 			string strPort, string strUserName, string strPassword)
 		{
 			m_pstProxyType = pst;
@@ -120,7 +134,15 @@ namespace KeePassLib.Serialization
 
 		internal static void ConfigureWebClient(WebClient wc)
 		{
-
+#if !KeePassLibAndroid
+			// Not implemented and ignored in Mono < 2.10
+			try
+			{
+				wc.CachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
+			}
+			catch(NotImplementedException) { }
+			catch(Exception) { Debug.Assert(false); }
+#endif
 			try
 			{
 				IWebProxy prx;
@@ -179,8 +201,16 @@ namespace KeePassLib.Serialization
 
 		private static void PrepareWebAccess()
 		{
+#if KeePassLibAndroid
 			ServicePointManager.ServerCertificateValidationCallback =
 				ValidateServerCertificate;
+#else
+			if(m_bSslCertsAcceptInvalid)
+				ServicePointManager.ServerCertificateValidationCallback =
+					IOConnection.AcceptCertificate;
+			else
+				ServicePointManager.ServerCertificateValidationCallback = null;
+#endif
 		}
 
 		private static IOWebClient CreateWebClient(IOConnectionInfo ioc, bool digestAuth)
@@ -270,15 +300,15 @@ namespace KeePassLib.Serialization
 
 		public static Stream OpenRead(IOConnectionInfo ioc)
 		{
-			if (StrUtil.IsDataUri(ioc.Path))
+			RaiseIOAccessPreEvent(ioc, IOAccessType.Read);
+
+			if(StrUtil.IsDataUri(ioc.Path))
 			{
 				byte[] pbData = StrUtil.DataUriToData(ioc.Path);
-				if (pbData != null)
-					return new MemoryStream(pbData, false);
+				if(pbData != null) return new MemoryStream(pbData, false);
 			}
 
-			if (ioc.IsLocalFile())
-				return OpenReadLocal(ioc);
+			if(ioc.IsLocalFile()) return OpenReadLocal(ioc);
 
 			try
 			{ 
@@ -295,6 +325,8 @@ namespace KeePassLib.Serialization
 #else
 		public static Stream OpenRead(IOConnectionInfo ioc)
 		{
+			RaiseIOAccessPreEvent(ioc, IOAccessType.Read);
+
 			return OpenReadLocal(ioc);
 		}
 #endif
@@ -305,7 +337,7 @@ namespace KeePassLib.Serialization
 				FileShare.Read);
 		}
 
-#if !KeePassLibSD
+#if KeePassLibAndroid
 
 		class UploadOnCloseMemoryStream: MemoryStream
 		{
@@ -354,10 +386,14 @@ namespace KeePassLib.Serialization
 				}
 			}
 		}
+#endif 
 
+#if (!KeePassLibSD && !KeePassRT)
 		public static Stream OpenWrite(IOConnectionInfo ioc)
 		{
 			if(ioc == null) { Debug.Assert(false); return null; }
+
+			RaiseIOAccessPreEvent(ioc, IOAccessType.Write);
 
 			if(ioc.IsLocalFile()) return OpenWriteLocal(ioc);
 
@@ -375,6 +411,8 @@ namespace KeePassLib.Serialization
 #else
 		public static Stream OpenWrite(IOConnectionInfo ioc)
 		{
+			RaiseIOAccessPreEvent(ioc, IOAccessType.Write);
+
 			return OpenWriteLocal(ioc);
 		}
 #endif
@@ -394,9 +432,11 @@ namespace KeePassLib.Serialization
 		{
 			if(ioc == null) { Debug.Assert(false); return false; }
 
+			RaiseIOAccessPreEvent(ioc, IOAccessType.Exists);
+
 			if(ioc.IsLocalFile()) return File.Exists(ioc.Path);
 
-#if !KeePassLibSD
+#if (!KeePassLibSD && !KeePassRT)
 			if(ioc.Path.StartsWith("ftp://", StrUtil.CaseIgnoreCmp))
 			{
 				bool b = SendCommand(ioc, WebRequestMethods.Ftp.GetDateTimestamp);
@@ -408,8 +448,11 @@ namespace KeePassLib.Serialization
 			try
 			{
 				Stream s = OpenRead(ioc);
+#if KeePassLibAndroid
 				if(s == null) throw new Java.IO.FileNotFoundException();
-
+#else
+				if(s == null) throw new FileNotFoundException();
+#endif
 				try { s.ReadByte(); }
 				catch(Exception) { }
 
@@ -448,9 +491,11 @@ namespace KeePassLib.Serialization
 
 		public static void DeleteFile(IOConnectionInfo ioc)
 		{
+			RaiseIOAccessPreEvent(ioc, IOAccessType.Delete);
+
 			if(ioc.IsLocalFile()) { File.Delete(ioc.Path); return; }
 
-#if !KeePassLibSD
+#if (!KeePassLibSD && !KeePassRT)
 			RepeatWithDigestOnFail(ioc, (WebRequest req) => {
 				if(req != null)
 				{
@@ -480,10 +525,13 @@ namespace KeePassLib.Serialization
 		/// <param name="iocTo">Target file path.</param>
 		public static void RenameFile(IOConnectionInfo iocFrom, IOConnectionInfo iocTo)
 		{
+			RaiseIOAccessPreEvent(iocFrom, iocTo, IOAccessType.Move);
+
 			if(iocFrom.IsLocalFile()) { File.Move(iocFrom.Path, iocTo.Path); return; }
 
-#if !KeePassLibSD
-			RepeatWithDigestOnFail(iocFrom, (WebRequest req)=> { if(req != null)
+#if (!KeePassLibSD && !KeePassRT)
+			RepeatWithDigestOnFail(iocFrom, (WebRequest req)=> {
+			if(req != null)
 			{
 				if(req is HttpWebRequest)
 				{
@@ -493,7 +541,13 @@ namespace KeePassLib.Serialization
 				else if(req is FtpWebRequest)
 				{
 					req.Method = WebRequestMethods.Ftp.Rename;
-					((FtpWebRequest)req).RenameTo = UrlUtil.GetFileName(iocTo.Path);
+					string strTo = UrlUtil.GetFileName(iocTo.Path);
+
+					// We're affected by .NET bug 621450:
+					// https://connect.microsoft.com/VisualStudio/feedback/details/621450/problem-renaming-file-on-ftp-server-using-ftpwebrequest-in-net-framework-4-0-vs2010-only
+					// Prepending "./", "%2E/" or "Dummy/../" doesn't work.
+
+					((FtpWebRequest)req).RenameTo = strTo;
 				}
 				else if(req is FileWebRequest)
 				{
@@ -526,15 +580,14 @@ namespace KeePassLib.Serialization
 			// DeleteFile(iocFrom);
 		}
 
-#if !KeePassLibSD
+#if (!KeePassLibSD && !KeePassRT)
 		private static bool SendCommand(IOConnectionInfo ioc, string strMethod)
 		{
 			try
 			{
 				RepeatWithDigestOnFail(ioc, (WebRequest req)=> {
 					req.Method = strMethod;
-					DisposeResponse(req.GetResponse(), true);
-			
+					DisposeResponse(req.GetResponse(), true);			
 				});
 			}
 			catch(Exception) { return false; }
@@ -583,6 +636,25 @@ namespace KeePassLib.Serialization
 			}
 
 			return null;
+		}
+
+		private static void RaiseIOAccessPreEvent(IOConnectionInfo ioc, IOAccessType t)
+		{
+			RaiseIOAccessPreEvent(ioc, null, t);
+		}
+
+		private static void RaiseIOAccessPreEvent(IOConnectionInfo ioc,
+			IOConnectionInfo ioc2, IOAccessType t)
+		{
+			if(ioc == null) { Debug.Assert(false); return; }
+			// ioc2 may be null
+
+			if(IOConnection.IOAccessPre != null)
+			{
+				IOConnectionInfo ioc2Lcl = ((ioc2 != null) ? ioc2.CloneDeep() : null);
+				IOAccessEventArgs e = new IOAccessEventArgs(ioc.CloneDeep(), ioc2Lcl, t);
+				IOConnection.IOAccessPre(null, e);
+			}
 		}
 	}
 }
