@@ -255,10 +255,14 @@ namespace KeePassLib.Serialization
 						wc.Credentials = credentialCache;
 					} catch (NotImplementedException e)
 					{ 
+#if KeePassLibAndroid
 						Kp2aLog.Log(e.ToString());
+#endif
 					} catch (Exception e)
 					{ 
+#if KeePassLibAndroid
 						Kp2aLog.Log(e.ToString());
+#endif
 						Debug.Assert(false); 
 					}
 				}
@@ -337,8 +341,6 @@ namespace KeePassLib.Serialization
 				FileShare.Read);
 		}
 
-#if KeePassLibAndroid
-
 		class UploadOnCloseMemoryStream: MemoryStream
 		{
 			IOConnectionInfo ioc;
@@ -371,8 +373,7 @@ namespace KeePassLib.Serialization
 						uploadData(IOConnection.CreateWebClient(ioc, true));
 					else
 						throw ex;
-				}
-				
+				}				
 			}
 
 			void uploadData(WebClient webClient)
@@ -386,7 +387,6 @@ namespace KeePassLib.Serialization
 				}
 			}
 		}
-#endif 
 
 #if (!KeePassLibSD && !KeePassRT)
 		public static Stream OpenWrite(IOConnectionInfo ioc)

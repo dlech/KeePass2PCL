@@ -28,7 +28,7 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Drawing;
 using System.Diagnostics;
-#if !KeePassLibAndroid
+#if !KeePassLibAndroid && !KeePassLibMac
 using System.Windows.Forms;
 #endif
 
@@ -157,7 +157,7 @@ namespace KeePassLib.Translation
 			return new Dictionary<string, string>();
 		}
 
-#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid)
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid && !KeePassLibMac)
 		public void ApplyTo(Form form)
 		{
 			if(form == null) throw new ArgumentNullException("form");

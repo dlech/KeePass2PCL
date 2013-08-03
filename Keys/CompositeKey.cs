@@ -272,7 +272,9 @@ namespace KeePassLib.Keys
 			if (NativeLib.TransformKey256(pbNewKey, pbKeySeed32, uNumRounds))
 			{
 				sw.Stop();
+#if KeePassLibAndroid
 				Kp2aLog.Log("Native transform:" +sw.ElapsedMilliseconds+"ms");
+#endif
 				return pbNewKey;
 			}
 
@@ -280,8 +282,9 @@ namespace KeePassLib.Keys
 			if(TransformKeyManaged(pbNewKey, pbKeySeed32, uNumRounds) == false)
 				return null;
 			sw.Stop();
+#if KeePassLibAndroid
 			Kp2aLog.Log("Managed transform:" +sw.ElapsedMilliseconds+"ms");
-
+#endif
 			SHA256Managed sha256 = new SHA256Managed();
 			return sha256.ComputeHash(pbNewKey);
 		}

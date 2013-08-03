@@ -29,7 +29,7 @@ using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Drawing;
-#if !KeePassLibAndroid
+#if !KeePassLibAndroid && !KeePassLibMac
 using System.Windows.Forms;
 #endif
 
@@ -116,7 +116,7 @@ namespace KeePassLib.Translation
 			else { Debug.Assert(false); }
 		}
 
-#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid)
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid && !KeePassLibMac)
 		internal void ApplyTo(Control c)
 		{
 			Debug.Assert(c != null); if(c == null) return;
@@ -271,7 +271,7 @@ namespace KeePassLib.Translation
 			return m_strMemberName.CompareTo(kpOther.Name);
 		}
 
-#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid)
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid && !KeePassLibMac)
 		private static readonly Type[] m_vTextControls = new Type[] {
 			typeof(MenuStrip), typeof(PictureBox), typeof(ListView),
 			typeof(TreeView), typeof(ToolStrip), typeof(WebBrowser),

@@ -25,7 +25,7 @@ using System.Text;
 using System.Xml.Serialization;
 using System.Diagnostics;
 using System.Reflection;
-#if !KeePassLibAndroid
+#if !KeePassLibAndroid && !KeePassLibMac
 using System.Windows.Forms;
 #endif
 
@@ -70,7 +70,7 @@ namespace KeePassLib.Translation
 			}
 		}
 
-#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid)
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid && !KeePassLibMac)
 		private Form m_formEnglish = null;
 		[XmlIgnore]
 		public Form FormEnglish

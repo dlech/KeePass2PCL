@@ -24,7 +24,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 using System.Diagnostics;
-#if !KeePassLibAndroid
+#if !KeePassLibAndroid && !KeePassLibMac
 using System.Windows.Forms;
 #endif
 
@@ -70,7 +70,7 @@ namespace KeePassLib.Translation
 			return dict;
 		}
 
-#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid)
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid && !KeePassLibMac)
 		public void ApplyTo(ToolStripItemCollection tsic)
 		{
 			if(tsic == null) throw new ArgumentNullException("tsic");

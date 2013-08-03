@@ -25,8 +25,8 @@ using System.Security.Cryptography;
 using System.IO;
 using System.Diagnostics;
 using System.Drawing;
-#if !KeePassLibAndroid
-using System.Windows.Forms
+#if !KeePassLibAndroid && !KeePassLibMac
+using System.Windows.Forms;
 #endif
 
 using KeePassLib.Native;
@@ -141,7 +141,7 @@ namespace KeePassLib.Cryptography
 			pb = TimeUtil.PackTime(DateTime.Now);
 			ms.Write(pb, 0, pb.Length);
 
-#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid)
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid && !KeePassLibMac)
 			Point pt = Cursor.Position;
 			pb = MemUtil.UInt32ToBytes((uint)pt.X);
 			ms.Write(pb, 0, pb.Length);
@@ -155,7 +155,7 @@ namespace KeePassLib.Cryptography
 			pb = MemUtil.UInt32ToBytes((uint)NativeLib.GetPlatformID());
 			ms.Write(pb, 0, pb.Length);
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibMac)
 			try
 			{
 				pb = MemUtil.UInt32ToBytes((uint)Environment.ProcessorCount);
@@ -270,7 +270,7 @@ namespace KeePassLib.Cryptography
 
 				long lCopy = (long)((uRequestedBytes < 32) ? uRequestedBytes : 32);
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT && ! KeePassLibMac)
 				Array.Copy(pbRandom256, 0, pbRes, lPos, lCopy);
 #else
 				Array.Copy(pbRandom256, 0, pbRes, (int)lPos, (int)lCopy);

@@ -24,7 +24,9 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
 using System.Diagnostics;
-#if !KeePassLibAndroid
+#if KeePassLibMac
+using MonoMac.AppKit;
+#elif !KeePassLibAndroid
 using System.Windows.Forms;
 #endif
 
@@ -33,18 +35,25 @@ using KeePassLib.Serialization;
 
 namespace KeePassLib.Utility
 {
-#if KeePassLibAndroid
+#if KeePassLibAndroid || KeePassLibMac
 	public enum MessageBoxButtons
 	{
 		OK, OKCancel, AbortRetryIgnore, YesNoCancel, YesNo, RetryCancel
 	}
+
 	public enum MessageBoxIcon
 	{
-		Information, Warning, Error, Question
+		Information, Warning, Error, Question, None
 	}
+
 	public enum MessageBoxDefaultButton
 	{
 		Button1, Button2, Button3
+	}
+
+	public enum MessageBoxOptions
+	{
+		DefaultDesktopOnly, RightAlign, RtlReading, ServiceNotification
 	}
 
 	public enum DialogResult
@@ -57,29 +66,22 @@ namespace KeePassLib.Utility
 	{
 		private string m_strTitle = string.Empty;
 		private string m_strText = string.Empty;
-#if !KeePassLibAndroid
 		private MessageBoxButtons m_msgButtons = MessageBoxButtons.OK;
 		private MessageBoxIcon m_msgIcon = MessageBoxIcon.None;
-#endif
 
 		public string Title { get { return m_strTitle; } }
 		public string Text { get { return m_strText; } }
-#if !KeePassLibAndroid
 		public MessageBoxButtons Buttons { get { return m_msgButtons; } }
 		public MessageBoxIcon Icon { get { return m_msgIcon; } }
-#endif
 
 		public MessageServiceEventArgs() { }
-
 		public MessageServiceEventArgs(string strTitle, string strText,
 			MessageBoxButtons msgButtons, MessageBoxIcon msgIcon)
 		{
 			m_strTitle = (strTitle ?? string.Empty);
 			m_strText = (strText ?? string.Empty);
-#if !KeePassLibAndroid
 			m_msgButtons = msgButtons;
 			m_msgIcon = msgIcon;
-#endif
 		}
 	}
 
@@ -91,10 +93,8 @@ namespace KeePassLib.Utility
 		private const MessageBoxIcon m_mbiInfo = MessageBoxIcon.Information;
 		private const MessageBoxIcon m_mbiWarning = MessageBoxIcon.Warning;
 		private const MessageBoxIcon m_mbiFatal = MessageBoxIcon.Error;
-#if !KeePassLibAndroid
 		private const MessageBoxOptions m_mboRtl = (MessageBoxOptions.RtlReading |
 			MessageBoxOptions.RightAlign);
-#endif
 #else
 		private const MessageBoxIcon m_mbiInfo = MessageBoxIcon.Asterisk;
 		private const MessageBoxIcon m_mbiWarning = MessageBoxIcon.Exclamation;
@@ -189,7 +189,7 @@ namespace KeePassLib.Utility
 			return sbText.ToString();
 		}
 
-#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid)
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid && !KeePassLibMac)
 		internal static Form GetTopForm()
 		{
 			FormCollection fc = Application.OpenForms;
@@ -210,6 +210,8 @@ namespace KeePassLib.Utility
 				//Android.Widget.Toast toast = ..
 			}
 			//this might help: http://www.gregshackles.com/2011/04/using-background-threads-in-mono-for-android-applications/
+			throw new NotImplementedException();
+#elif KeePassLibMac
 			throw new NotImplementedException();
 #else
 			IWin32Window wnd = null;
@@ -244,7 +246,7 @@ namespace KeePassLib.Utility
 #endif
 		}
 
-#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid)
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndroid && !KeePassLibMac)
 		internal delegate DialogResult SafeShowMessageBoxInternalDelegate(IWin32Window iParent,
 			string strText, string strTitle, MessageBoxButtons mb, MessageBoxIcon mi,
 			MessageBoxDefaultButton mdb);
@@ -325,9 +327,11 @@ namespace KeePassLib.Utility
 				Clipboard.SetDataObject(ObjectsToMessage(vLines, true));
 #elif KeePassLibAndroid
 				// nicht benoetigt - hoffentlich :-)
+#elif KeePassLibMac
+				// TODO: Clear Mac Clipboard
 #else
 				Clipboard.Clear();
-				Clipboard.SetText(ObjectsToMessage(vLines, true));				
+				Clipboard.SetText(ObjectsToMessage(vLines, true));
 #endif
 			}
 			catch(Exception) { Debug.Assert(false); }

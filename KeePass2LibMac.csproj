@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{53573E4E-33CB-4FDB-8698-C95F5E40E7F3}</ProjectGuid>
+    <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>KeePassLib</RootNamespace>
+    <AssemblyName>KeePassLib</AssemblyName>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>KeePassLib.pfx</AssemblyOriginatorKeyFile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;KeePassLibMac</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\Build\KeePassLib\Debug\KeePassLib.xml</DocumentationFile>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <UseSGen>false</UseSGen>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>KeePassLibMac</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\Build\KeePassLib\Release\KeePassLib.xml</DocumentationFile>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <UseSGen>false</UseSGen>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml" />
+    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.640\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Collections\AutoTypeConfig.cs" />
+    <Compile Include="Collections\ProtectedBinaryDictionary.cs" />
+    <Compile Include="Collections\ProtectedStringDictionary.cs" />
+    <Compile Include="Collections\PwObjectList.cs" />
+    <Compile Include="Collections\PwObjectPool.cs" />
+    <Compile Include="Collections\StringDictionaryEx.cs" />
+    <Compile Include="Cryptography\Cipher\CipherPool.cs" />
+    <Compile Include="Cryptography\Cipher\Salsa20Cipher.cs" />
+    <Compile Include="Cryptography\Cipher\StandardAesEngine.cs" />
+    <Compile Include="Cryptography\CryptoRandom.cs" />
+    <Compile Include="Cryptography\CryptoRandomStream.cs" />
+    <Compile Include="Cryptography\Cipher\ICipherEngine.cs" />
+    <Compile Include="Cryptography\HashingStreamEx.cs" />
+    <Compile Include="Cryptography\HmacOtp.cs" />
+    <Compile Include="Cryptography\PasswordGenerator\CharSetBasedGenerator.cs" />
+    <Compile Include="Cryptography\PasswordGenerator\CustomPwGenerator.cs" />
+    <Compile Include="Cryptography\PasswordGenerator\CustomPwGeneratorPool.cs" />
+    <Compile Include="Cryptography\PasswordGenerator\PatternBasedGenerator.cs" />
+    <Compile Include="Cryptography\PasswordGenerator\PwCharSet.cs" />
+    <Compile Include="Cryptography\PasswordGenerator\PwProfile.cs" />
+    <Compile Include="Cryptography\PopularPasswords.cs" />
+    <Compile Include="Cryptography\QualityEstimation.cs" />
+    <Compile Include="Cryptography\SelfTest.cs" />
+    <Compile Include="Interfaces\IStructureItem.cs" />
+    <Compile Include="Interfaces\IUIOperations.cs" />
+    <Compile Include="Interfaces\IXmlSerializerEx.cs" />
+    <Compile Include="Keys\KcpCustomKey.cs" />
+    <Compile Include="Keys\KeyProvider.cs" />
+    <Compile Include="Keys\KeyProviderPool.cs" />
+    <Compile Include="Keys\KeyValidator.cs" />
+    <Compile Include="Keys\KeyValidatorPool.cs" />
+    <Compile Include="Keys\UserKeyType.cs" />
+    <Compile Include="Native\NativeMethods.cs" />
+    <Compile Include="PwCustomIcon.cs" />
+    <Compile Include="Resources\KLRes.Generated.cs" />
+    <Compile Include="Resources\KSRes.Generated.cs" />
+    <Compile Include="Security\XorredBuffer.cs" />
+    <Compile Include="Delegates\Handlers.cs" />
+    <Compile Include="Interfaces\IDeepCloneable.cs" />
+    <Compile Include="Interfaces\IStatusLogger.cs" />
+    <Compile Include="Interfaces\ITimeLogger.cs" />
+    <Compile Include="Keys\KcpKeyFile.cs" />
+    <Compile Include="Keys\IUserKey.cs" />
+    <Compile Include="Keys\KcpPassword.cs" />
+    <Compile Include="Keys\KcpUserAccount.cs" />
+    <Compile Include="PwDeletedObject.cs" />
+    <Compile Include="PwUuid.cs" />
+    <Compile Include="Security\ProtectedBinary.cs" />
+    <Compile Include="Security\ProtectedString.cs" />
+    <Compile Include="PwDefs.cs" />
+    <Compile Include="PwEntry.cs" />
+    <Compile Include="PwGroup.cs" />
+    <Compile Include="Keys\CompositeKey.cs" />
+    <Compile Include="PwDatabase.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PwEnums.cs" />
+    <Compile Include="Serialization\BinaryReaderEx.cs" />
+    <Compile Include="Serialization\FileLock.cs" />
+    <Compile Include="Serialization\FileTransactionEx.cs" />
+    <Compile Include="Serialization\HashedBlockStream.cs" />
+    <Compile Include="Serialization\IOConnection.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Serialization\KdbxFile.cs" />
+    <Compile Include="Serialization\KdbxFile.Read.cs" />
+    <Compile Include="Serialization\KdbxFile.Read.Streamed.cs" />
+    <Compile Include="Serialization\KdbxFile.Write.cs" />
+    <Compile Include="Serialization\IOConnectionInfo.cs" />
+    <Compile Include="Serialization\OldFormatException.cs" />
+    <Compile Include="Translation\KPControlCustomization.cs" />
+    <Compile Include="Translation\KPFormCustomization.cs" />
+    <Compile Include="Translation\KPStringTable.cs" />
+    <Compile Include="Translation\KPStringTableItem.cs" />
+    <Compile Include="Translation\KPTranslation.cs" />
+    <Compile Include="Translation\KPTranslationProperties.cs" />
+    <Compile Include="Utility\AppLogEx.cs" />
+    <Compile Include="Utility\GfxUtil.cs" />
+    <Compile Include="Utility\MemUtil.cs" />
+    <Compile Include="Utility\MessageService.cs" />
+    <Compile Include="Native\NativeLib.cs" />
+    <Compile Include="Cryptography\PasswordGenerator\PwGenerator.cs" />
+    <Compile Include="Utility\StrUtil.cs" />
+    <Compile Include="Utility\UrlUtil.cs" />
+    <Compile Include="Utility\TimeUtil.cs" />
+    <Compile Include="Serialization\ProtoBuf\KdbpFile.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="KeePassLib.pfx" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <TextStylePolicy TabsToSpaces="False" EolMarker="Windows" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy IndentSwitchBody="True" AnonymousMethodBraceStyle="NextLine" PropertyBraceStyle="NextLine" PropertyGetBraceStyle="NextLine" PropertySetBraceStyle="NextLine" EventBraceStyle="NextLine" EventAddBraceStyle="NextLine" EventRemoveBraceStyle="NextLine" StatementBraceStyle="NextLine" ElseNewLinePlacement="NewLine" CatchNewLinePlacement="NewLine" FinallyNewLinePlacement="NewLine" WhileNewLinePlacement="DoNotCare" ArrayInitializerWrapping="DoNotChange" ArrayInitializerBraceStyle="NextLine" BeforeMethodDeclarationParentheses="False" BeforeMethodCallParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" SpacesBeforeBrackets="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy TabsToSpaces="False" EolMarker="Windows" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/plain" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+  <ItemGroup>
+    <Folder Include="Serialization\ProtoBuf\" />
+  </ItemGroup>
+</Project>

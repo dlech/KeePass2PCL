@@ -28,7 +28,7 @@ using System.Diagnostics;
 #if KeePassLibAndroid
 using Android.Graphics;
 #else
-using System.Windows.Imaging;
+using System.Drawing.Imaging;
 #endif
 
 namespace KeePassLib.Utility
