@@ -36,6 +36,12 @@ using KeePassLib.Security;
 using KeePassLib.Serialization;
 using KeePassLib.Utility;
 
+#if KeePassLibAndroid
+using Image=Android.Graphics.Bitmap;
+#elif KeePassLibMac
+using Image=MonoMac.AppKit.NSImage;
+#endif
+
 namespace KeePassLib
 {
 	/// <summary>
@@ -1467,11 +1473,7 @@ namespace KeePassLib
 		/// </summary>
 		/// <param name="pwIconId">ID of the icon.</param>
 		/// <returns>Image data.</returns>
-#if KeePassLibAndroid
-		public Android.Graphics.Bitmap GetCustomIcon(PwUuid pwIconId)
-#else
 		public Image GetCustomIcon(PwUuid pwIconId)
-#endif
 		{
 			int nIndex = GetCustomIconIndex(pwIconId);
 

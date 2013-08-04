@@ -26,6 +26,12 @@ using System.IO;
 
 using KeePassLib.Utility;
 
+#if KeePassLibAndroid
+using Image=Android.Graphics.Bitmap;
+#elif KeePassLibMac
+using Image=MonoMac.AppKit.NSImage;
+#endif
+
 namespace KeePassLib
 {
 	/// <summary>
@@ -35,11 +41,7 @@ namespace KeePassLib
 	{
 		private PwUuid m_pwUuid;
 		private byte[] m_pbImageDataPng;
-#if KeePassLibAndroid
-		private Android.Graphics.Bitmap m_pCachedImage;
-#else
 		private Image m_pCachedImage;
-#endif
 
 		public PwUuid Uuid
 		{
@@ -51,11 +53,7 @@ namespace KeePassLib
 			get { return m_pbImageDataPng; }
 		}
 
-#if KeePassLibAndroid
-		public Android.Graphics.Bitmap Image
-#else
 		public Image Image
-#endif
 		{
 			get { return m_pCachedImage; }
 		}
@@ -73,13 +71,17 @@ namespace KeePassLib
 			m_pwUuid = pwUuid;
 			m_pbImageDataPng = pbImageDataPng;
 
-#if !KeePassLibSD
+#if KeePassLibSD
+			m_pCachedImage = null;
+#elif KeePassLibMac
+			using (var ms = new MemoryStream(m_pbImageDataPng, false)) {
+				m_pCachedImage = Image.FromStream(ms);
+			}
+#else
 			// MemoryStream ms = new MemoryStream(m_pbImageDataPng, false);
 			// m_pCachedImage = Image.FromStream(ms);
 			// ms.Close();
 			m_pCachedImage = GfxUtil.LoadImage(m_pbImageDataPng);
-#else
-			m_pCachedImage = null;
 #endif
 		}
 	}
