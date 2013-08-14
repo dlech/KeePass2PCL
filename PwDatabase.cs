@@ -50,8 +50,10 @@ namespace KeePassLib
 	/// </summary>
 	public sealed class PwDatabase
 	{
-		internal const int DefaultHistoryMaxItems = 10; // -1 = unlimited
-		internal const long DefaultHistoryMaxSize = 6 * 1024 * 1024; // -1 = unlimited
+		public const int DefaultHistoryMaxItems = 10; // -1 = unlimited
+		public const long DefaultHistoryMaxSize = 6 * 1024 * 1024; // -1 = unlimited
+		public const int DefaultRecommendMasterKeyChange = 182; // -1 = never
+		public const int DefaultForceMasterKeyChange = 365; // -1 = never
 
 		private static bool m_bPrimaryCreated = false;
 
