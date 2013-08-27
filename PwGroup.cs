@@ -1490,6 +1490,28 @@ namespace KeePassLib
 		}
 
 		/// <summary>
+		/// Inserts a subgroup to this group.
+		/// </summary>
+		/// <param name="index">The index to insert the group at.</param>
+		/// <param name="subGroup">Group to be inserted. Must not be <c>null</c>.</param>
+		/// <param name="bTakeOwnership">If this parameter is <c>true</c>, the
+		/// parent group reference of the subgroup will be set to the current
+		/// group (i.e. the current group takes ownership of the subgroup).</param>
+		/// <param name="bUpdateLocationChangedOfSub">If <c>true</c>, the
+		/// <c>LocationChanged</c> property of the subgroup is updated.</param>
+		public void InsertGroup(uint index, PwGroup subGroup, bool bTakeOwnership,
+		                        bool bUpdateLocationChangedOfSub)
+		{
+			if(subGroup == null) throw new ArgumentNullException("subGroup");
+
+			m_listGroups.Insert(index, subGroup);
+
+			if(bTakeOwnership) subGroup.m_pParentGroup = this;
+
+			if(bUpdateLocationChangedOfSub) subGroup.LocationChanged = DateTime.Now;
+		}
+
+		/// <summary>
 		/// Add an entry to this group.
 		/// </summary>
 		/// <param name="pe">Entry to be added. Must not be <c>null</c>.</param>
