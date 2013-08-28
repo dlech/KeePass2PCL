@@ -1546,6 +1546,30 @@ namespace KeePassLib
 			if(bUpdateLocationChangedOfEntry) pe.LocationChanged = DateTime.Now;
 		}
 
+		/// <summary>
+		/// Inserts an entry to this group.
+		/// </summary>
+		/// <param name="index">The index to insert the entry at.</param>
+		/// <param name="pe">Entry to be added. Must not be <c>null</c>.</param>
+		/// <param name="bTakeOwnership">If this parameter is <c>true</c>, the
+		/// parent group reference of the entry will be set to the current
+		/// group (i.e. the current group takes ownership of the entry).</param>
+		/// <param name="bUpdateLocationChangedOfEntry">If <c>true</c>, the
+		/// <c>LocationChanged</c> property of the entry is updated.</param>
+		public void InsertEntry(uint index, PwEntry pe, bool bTakeOwnership,
+		                        bool bUpdateLocationChangedOfEntry)
+		{
+			if(pe == null) throw new ArgumentNullException("pe");
+
+			m_listEntries.Insert(index, pe);
+
+			// Do not remove the entry from its previous parent group,
+			// only assign it to the new one
+			if(bTakeOwnership) pe.ParentGroup = this;
+
+			if(bUpdateLocationChangedOfEntry) pe.LocationChanged = DateTime.Now;
+		}
+
 		public void SortSubGroups(bool bRecursive)
 		{
 			m_listGroups.Sort(new PwGroupComparer());
