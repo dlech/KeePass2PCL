@@ -194,11 +194,23 @@ namespace KeePassLib.Collections
 			return true;
 		}
 
+		public int IndexOf(AutoTypeAssociation a)
+		{
+			return m_lWindowAssocs.IndexOf(a);
+		}
+
 		public void Add(AutoTypeAssociation a)
 		{
 			Debug.Assert(a != null); if(a == null) throw new ArgumentNullException("a");
 
 			m_lWindowAssocs.Add(a);
+		}
+
+		public void Insert(int iIndex, AutoTypeAssociation a)
+		{
+			Debug.Assert(a != null); if(a == null) throw new ArgumentNullException("a");
+
+			m_lWindowAssocs.Insert(iIndex, a);
 		}
 
 		public AutoTypeAssociation GetAt(int iIndex)
@@ -207,6 +219,14 @@ namespace KeePassLib.Collections
 				throw new ArgumentOutOfRangeException("iIndex");
 
 			return m_lWindowAssocs[iIndex];
+		}
+
+		public void SetAt(int iIndex, AutoTypeAssociation a)
+		{
+			if((iIndex < 0) || (iIndex >= m_lWindowAssocs.Count))
+				throw new ArgumentOutOfRangeException("iIndex");
+
+			m_lWindowAssocs[iIndex] = a;
 		}
 
 		public void RemoveAt(int iIndex)
