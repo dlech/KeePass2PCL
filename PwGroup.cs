@@ -149,7 +149,7 @@ namespace KeePassLib
 		{
 			get { return m_pParentGroup; }
 
-			/// Plugins: use <c>PwGroup.AddGroup</c> instead.
+			// Plugins: use <c>PwGroup.AddGroup</c> instead.
 			internal set { Debug.Assert(value != this); m_pParentGroup = value; }
 		}
 

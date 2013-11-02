@@ -90,7 +90,7 @@ namespace KeePassLib
 		{
 			get { return m_pParentGroup; }
 
-			/// Plugins: use <c>PwGroup.AddEntry</c> instead.
+			// Plugins: use <c>PwGroup.AddEntry</c> instead.
 			internal set { m_pParentGroup = value; }
 		}
 
