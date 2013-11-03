@@ -148,7 +148,11 @@ namespace KeePassLib.Serialization
 
 #if !KeePassRT
 #if !KeePassLibSD
+#if KeePassLibMac
+			xrs.DtdProcessing = DtdProcessing.Prohibit;
+#else
 			xrs.ProhibitDtd = true;
+#endif
 #endif
 			xrs.ValidationType = ValidationType.None;
 #endif
