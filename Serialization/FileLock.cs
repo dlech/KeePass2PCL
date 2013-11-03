@@ -30,6 +30,10 @@ using KeePassLib.Cryptography;
 using KeePassLib.Resources;
 using KeePassLib.Utility;
 
+#if KeePassLibAndroid
+using FileNotFoundException = Java.IO.FileNotFoundException;
+#endif
+
 namespace KeePassLib.Serialization
 {
 	public sealed class FileLockException : Exception
@@ -139,11 +143,7 @@ namespace KeePassLib.Serialization
 					if(!v[0].StartsWith(LockFileHeader)) { Debug.Assert(false); return null; }
 					return new LockFileInfo(v[1], v[2], v[3], v[4], v[5]);
 				}
-#if KeePassLibAndroid
-				catch(Java.IO.FileNotFoundException) { }
-#else
 				catch(FileNotFoundException) { }
-#endif
 				catch(Exception) { Debug.Assert(false); }
 				finally { if(s != null) s.Close(); }
 

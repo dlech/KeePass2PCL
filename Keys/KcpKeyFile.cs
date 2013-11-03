@@ -33,6 +33,10 @@ using KeePassLib.Security;
 using KeePassLib.Serialization;
 using KeePassLib.Utility;
 
+#if KeePassLibAndroid
+using FileNotFoundException = Java.IO.FileNotFoundException;
+#endif
+
 namespace KeePassLib.Keys
 {
 	/// <summary>
@@ -84,11 +88,8 @@ namespace KeePassLib.Keys
 		private void Construct(IOConnectionInfo iocFile, bool bThrowIfDbFile)
 		{
 			byte[] pbFileData = IOConnection.ReadFile(iocFile);
-#if KeePassLibAndroid
-			if(pbFileData == null) throw new Java.IO.FileNotFoundException();
-#else
+
 			if(pbFileData == null) throw new FileNotFoundException();
-#endif
 
 			if(bThrowIfDbFile && (pbFileData.Length >= 8))
 			{

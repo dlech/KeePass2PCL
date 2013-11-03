@@ -39,6 +39,7 @@ using KeePassLib.Native;
 using KeePassLib.Utility;
 #if KeePassLibAndroid
 using keepass2android;
+using FileNotFoundException = Java.IO.FileNotFoundException;
 #endif
 
 namespace KeePassLib.Serialization
@@ -448,11 +449,7 @@ namespace KeePassLib.Serialization
 			try
 			{
 				Stream s = OpenRead(ioc);
-#if KeePassLibAndroid
-				if(s == null) throw new Java.IO.FileNotFoundException();
-#else
 				if(s == null) throw new FileNotFoundException();
-#endif
 				try { s.ReadByte(); }
 				catch(Exception) { }
 
