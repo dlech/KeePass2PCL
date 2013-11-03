@@ -134,6 +134,24 @@ namespace KeePassLib.Serialization
 				else m_randomStream = null; // No random stream for plain-text files
 				if (m_slLogger != null)
 					m_slLogger.SetText("KP2AKEY_ParsingDatabase", LogStatusType.AdditionalInfo);
+				
+
+#if KeePassDebug_WriteXml
+				// FileStream fsOut = new FileStream("Raw.xml", FileMode.Create,
+				//	FileAccess.Write, FileShare.None);
+				// try
+				// {
+				//	while(true)
+				//	{
+				//		int b = readerStream.ReadByte();
+				//		if(b == -1) break;
+				//		fsOut.WriteByte((byte)b);
+				//	}
+				// }
+				// catch(Exception) { }
+				// fsOut.Close();
+#endif
+
 				ReadXmlStreamed(readerStream, hashedStream);
 				// ReadXmlDom(readerStream);
 

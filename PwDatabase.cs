@@ -915,7 +915,7 @@ namespace KeePassLib
 
 				foreach(PwDeletedObject pdo in listDelObjects)
 				{
-					if(pg.Uuid.EqualsValue(pdo.Uuid))
+					if(pg.Uuid.Equals(pdo.Uuid))
 					{
 						if(TimeUtil.Compare(pg.LastModificationTime,
 							pdo.DeletionTime, true) < 0)
@@ -930,7 +930,7 @@ namespace KeePassLib
 			{
 				foreach(PwDeletedObject pdo in listDelObjects)
 				{
-					if(pe.Uuid.EqualsValue(pdo.Uuid))
+					if(pe.Uuid.Equals(pdo.Uuid))
 					{
 						if(TimeUtil.Compare(pe.LastModificationTime,
 							pdo.DeletionTime, true) < 0)
@@ -956,7 +956,7 @@ namespace KeePassLib
 
 					foreach(PwDeletedObject pdoLocal in m_vDeletedObjects)
 					{
-						if(pdoNew.Uuid.EqualsValue(pdoLocal.Uuid))
+						if(pdoNew.Uuid.Equals(pdoLocal.Uuid))
 						{
 							bCopy = false;
 
@@ -990,7 +990,7 @@ namespace KeePassLib
 
 				PwGroup pgOrgParent = ptOrg.ParentGroup;
 				PwGroup pgSrcParent = ptSrc.ParentGroup;
-				if(pgOrgParent.Uuid.EqualsValue(pgSrcParent.Uuid))
+				if(pgOrgParent.Uuid.Equals(pgSrcParent.Uuid))
 				{
 					pg.LocationChanged = ((ptSrc.LocationChanged > ptOrg.LocationChanged) ?
 						ptSrc.LocationChanged : ptOrg.LocationChanged);
@@ -1010,7 +1010,7 @@ namespace KeePassLib
 				}
 				else
 				{
-					Debug.Assert(pg.ParentGroup.Uuid.EqualsValue(pgOrgParent.Uuid));
+					Debug.Assert(pg.ParentGroup.Uuid.Equals(pgOrgParent.Uuid));
 					Debug.Assert(pg.LocationChanged == ptOrg.LocationChanged);
 				}
 			}
@@ -1036,7 +1036,7 @@ namespace KeePassLib
 
 				PwGroup pgOrg = ptOrg.ParentGroup;
 				PwGroup pgSrc = ptSrc.ParentGroup;
-				if(pgOrg.Uuid.EqualsValue(pgSrc.Uuid))
+				if(pgOrg.Uuid.Equals(pgSrc.Uuid))
 				{
 					pe.LocationChanged = ((ptSrc.LocationChanged > ptOrg.LocationChanged) ?
 						ptSrc.LocationChanged : ptOrg.LocationChanged);
@@ -1054,7 +1054,7 @@ namespace KeePassLib
 				}
 				else
 				{
-					Debug.Assert(pe.ParentGroup.Uuid.EqualsValue(pgOrg.Uuid));
+					Debug.Assert(pe.ParentGroup.Uuid.Equals(pgOrg.Uuid));
 					Debug.Assert(pe.LocationChanged == ptOrg.LocationChanged);
 				}
 			}
@@ -1131,7 +1131,7 @@ namespace KeePassLib
 					bool bAdded = false;
 					foreach(PwUuid puBefore in qRelBefore)
 					{
-						if(puBefore.EqualsValue(pt.Uuid))
+						if(puBefore.Equals(pt.Uuid))
 						{
 							qBefore.Enqueue(pt);
 							bAdded = true;
@@ -1142,7 +1142,7 @@ namespace KeePassLib
 
 					foreach(PwUuid puAfter in qRelAfter)
 					{
-						if(puAfter.EqualsValue(pt.Uuid))
+						if(puAfter.Equals(pt.Uuid))
 						{
 							qAfter.Enqueue(pt);
 							bAdded = true;
@@ -1237,7 +1237,7 @@ namespace KeePassLib
 			{
 				PwUuid pw = vItems[i].Uuid;
 
-				if(pw.EqualsValue(pwPivot)) bBefore = false;
+				if(pw.Equals(pwPivot)) bBefore = false;
 				else if(bBefore) qBefore.Enqueue(pw);
 				else qAfter.Enqueue(pw);
 			}
@@ -1273,8 +1273,8 @@ namespace KeePassLib
 			PwGroup pgSrcParent = ptSrc.ParentGroup;
 			if(pgSrcParent == null) return true; // Root might be in tree
 
-			if(!ptFirst.ParentGroup.Uuid.EqualsValue(pgOrgParent.Uuid)) return true;
-			if(!pgOrgParent.Uuid.EqualsValue(pgSrcParent.Uuid)) return true;
+			if(!ptFirst.ParentGroup.Uuid.Equals(pgOrgParent.Uuid)) return true;
+			if(!pgOrgParent.Uuid.Equals(pgSrcParent.Uuid)) return true;
 
 			List<IStructureItem> lOrg = pgOrgParent.GetObjects(false, bEntries);
 			List<IStructureItem> lSrc = pgSrcParent.GetObjects(false, bEntries);
@@ -1286,8 +1286,8 @@ namespace KeePassLib
 				IStructureItem pt = vItems.GetAt(u);
 				Debug.Assert(pt.ParentGroup == ptFirst.ParentGroup);
 
-				if(!pt.Uuid.EqualsValue(lOrg[(int)u].Uuid)) return true;
-				if(!pt.Uuid.EqualsValue(lSrc[(int)u].Uuid)) return true;
+				if(!pt.Uuid.Equals(lOrg[(int)u].Uuid)) return true;
+				if(!pt.Uuid.Equals(lSrc[(int)u].Uuid)) return true;
 				if(pt.LocationChanged != lOrg[(int)u].LocationChanged) return true;
 				if(pt.LocationChanged != lSrc[(int)u].LocationChanged) return true;
 			}
@@ -1354,7 +1354,7 @@ namespace KeePassLib
 		private void MergeEntryHistory(PwEntry pe, PwEntry peSource,
 			PwMergeMethod mm)
 		{
-			if(!pe.Uuid.EqualsValue(peSource.Uuid)) { Debug.Assert(false); return; }
+			if(!pe.Uuid.Equals(peSource.Uuid)) { Debug.Assert(false); return; }
 
 			if(pe.History.UCount == peSource.History.UCount)
 			{
@@ -1399,7 +1399,7 @@ namespace KeePassLib
 			pe.History.Clear();
 			foreach(KeyValuePair<DateTime, PwEntry> kvpCur in dict)
 			{
-				Debug.Assert(kvpCur.Value.Uuid.EqualsValue(pe.Uuid));
+				Debug.Assert(kvpCur.Value.Uuid.Equals(pe.Uuid));
 				Debug.Assert(kvpCur.Value.History.UCount == 0);
 				pe.History.Add(kvpCur.Value);
 			}
@@ -1444,7 +1444,7 @@ namespace KeePassLib
 			for(int i = 0; i < m_vCustomIcons.Count; ++i)
 			{
 				PwCustomIcon pwci = m_vCustomIcons[i];
-				if(pwci.Uuid.EqualsValue(pwIconId))
+				if(pwci.Uuid.Equals(pwIconId))
 					return i;
 			}
 
@@ -1492,11 +1492,11 @@ namespace KeePassLib
 			GroupHandler gh = delegate(PwGroup pg)
 			{
 				PwUuid uuidThis = pg.CustomIconUuid;
-				if(uuidThis.EqualsValue(PwUuid.Zero)) return true;
+				if(uuidThis.Equals(PwUuid.Zero)) return true;
 
 				foreach(PwUuid uuidDelete in vUuidsToDelete)
 				{
-					if(uuidThis.EqualsValue(uuidDelete))
+					if(uuidThis.Equals(uuidDelete))
 					{
 						pg.CustomIconUuid = PwUuid.Zero;
 						break;
@@ -1531,11 +1531,11 @@ namespace KeePassLib
 		private static void RemoveCustomIconUuid(PwEntry pe, List<PwUuid> vToDelete)
 		{
 			PwUuid uuidThis = pe.CustomIconUuid;
-			if(uuidThis.EqualsValue(PwUuid.Zero)) return;
+			if(uuidThis.Equals(PwUuid.Zero)) return;
 
 			foreach(PwUuid uuidDelete in vToDelete)
 			{
-				if(uuidThis.EqualsValue(uuidDelete))
+				if(uuidThis.Equals(uuidDelete))
 				{
 					pe.CustomIconUuid = PwUuid.Zero;
 					break;
@@ -1555,7 +1555,7 @@ namespace KeePassLib
 			GroupHandler gh = delegate(PwGroup pg)
 			{
 				foreach(PwUuid u in l)
-					bAllUnique &= !pg.Uuid.EqualsValue(u);
+					bAllUnique &= !pg.Uuid.Equals(u);
 				l.Add(pg.Uuid);
 				return bAllUnique;
 			};
@@ -1563,7 +1563,7 @@ namespace KeePassLib
 			EntryHandler eh = delegate(PwEntry pe)
 			{
 				foreach(PwUuid u in l)
-					bAllUnique &= !pe.Uuid.EqualsValue(u);
+					bAllUnique &= !pe.Uuid.Equals(u);
 				l.Add(pe.Uuid);
 				return bAllUnique;
 			};
@@ -1778,11 +1778,11 @@ namespace KeePassLib
 			GroupHandler gh = delegate(PwGroup pg)
 			{
 				PwUuid pwUuid = pg.CustomIconUuid;
-				if((pwUuid == null) || pwUuid.EqualsValue(PwUuid.Zero)) return true;
+				if((pwUuid == null) || pwUuid.Equals(PwUuid.Zero)) return true;
 
 				for(int i = 0; i < lToDelete.Count; ++i)
 				{
-					if(lToDelete[i].EqualsValue(pwUuid))
+					if(lToDelete[i].Equals(pwUuid))
 					{
 						lToDelete.RemoveAt(i);
 						break;
@@ -1795,11 +1795,11 @@ namespace KeePassLib
 			EntryHandler eh = delegate(PwEntry pe)
 			{
 				PwUuid pwUuid = pe.CustomIconUuid;
-				if((pwUuid == null) || pwUuid.EqualsValue(PwUuid.Zero)) return true;
+				if((pwUuid == null) || pwUuid.Equals(PwUuid.Zero)) return true;
 
 				for(int i = 0; i < lToDelete.Count; ++i)
 				{
-					if(lToDelete[i].EqualsValue(pwUuid))
+					if(lToDelete[i].Equals(pwUuid))
 					{
 						lToDelete.RemoveAt(i);
 						break;
