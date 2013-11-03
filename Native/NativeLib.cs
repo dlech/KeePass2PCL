@@ -22,9 +22,11 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
+#if !KeePassLibMac && !KeePassLibAndorid
+using System.Windows.Forms;
+#endif
 
 using KeePassLib.Utility;
 
@@ -93,11 +95,13 @@ namespace KeePassLib.Native
 
 #if KeePassRT
 			m_platID = PlatformID.Win32NT;
+#elif KeePassLibMac
+			m_platID = PlatformID.MacOSX;
 #else
 			m_platID = Environment.OSVersion.Platform;
 #endif
 
-#if (!KeePassLibSD && !KeePassRT && !KeePAssLibAndroid)
+#if (!KeePassLibSD && !KeePassRT && !KeePAssLibAndroid && !KeePassLibMac)
 			// Mono returns PlatformID.Unix on Mac OS X, workaround this
 			if(m_platID.Value == PlatformID.Unix)
 			{
@@ -110,7 +114,7 @@ namespace KeePassLib.Native
 			return m_platID.Value;
 		}
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT && !KeePassLibAndorid && !KeePassLibMac)
 		public static string RunConsoleApp(string strAppPath, string strParams)
 		{
 			return RunConsoleApp(strAppPath, strParams, null);

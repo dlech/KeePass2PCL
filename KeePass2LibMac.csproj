@@ -29,7 +29,7 @@
     <DefineConstants>DEBUG;TRACE;KeePassLibMac</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\Build\KeePassLib\Debug\KeePassLib.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\KeePassLib.xml</DocumentationFile>
     <EnableCodeSigning>false</EnableCodeSigning>
     <CreatePackage>false</CreatePackage>
     <EnablePackageSigning>false</EnablePackageSigning>
@@ -42,7 +42,7 @@
     <DefineConstants>KeePassLibMac</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\Build\KeePassLib\Release\KeePassLib.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\KeePassLib.xml</DocumentationFile>
     <EnableCodeSigning>false</EnableCodeSigning>
     <CreatePackage>false</CreatePackage>
     <EnablePackageSigning>false</EnablePackageSigning>
