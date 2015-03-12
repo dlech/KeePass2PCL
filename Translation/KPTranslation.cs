@@ -23,7 +23,6 @@ using System.Text;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Windows.Forms;
 using System.ComponentModel;
 using System.Drawing;
 using System.Diagnostics;
@@ -153,7 +152,7 @@ namespace KeePassLib.Translation
 			return new Dictionary<string, string>();
 		}
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (false && !KeePassLibSD && !KeePassRT)
 		public void ApplyTo(Form form)
 		{
 			if(form == null) throw new ArgumentNullException("form");

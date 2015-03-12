@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using System.Threading;
 using System.IO;
 using System.Reflection;
@@ -136,7 +135,7 @@ namespace KeePassLib.Native
 			m_platID = Environment.OSVersion.Platform;
 #endif
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (false && !KeePassLibSD && !KeePassRT)
 			// Mono returns PlatformID.Unix on Mac OS X, workaround this
 			if(m_platID.Value == PlatformID.Unix)
 			{
@@ -149,7 +148,7 @@ namespace KeePassLib.Native
 			return m_platID.Value;
 		}
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (false && !KeePassLibSD && !KeePassRT)
 		public static string RunConsoleApp(string strAppPath, string strParams)
 		{
 			return RunConsoleApp(strAppPath, strParams, null);

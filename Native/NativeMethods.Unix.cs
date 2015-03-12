@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Diagnostics;
@@ -29,7 +28,7 @@ namespace KeePassLib.Native
 {
 	internal static partial class NativeMethods
 	{
-#if (!KeePassLibSD && !KeePassRT)
+#if (false && !KeePassLibSD && !KeePassRT)
 		[StructLayout(LayoutKind.Sequential)]
 		private struct XClassHint
 		{

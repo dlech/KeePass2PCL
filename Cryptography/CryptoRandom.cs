@@ -22,8 +22,6 @@ using System.Security;
 using System.Security.Cryptography;
 using System.IO;
 using System.Diagnostics;
-using System.Windows.Forms;
-using System.Drawing;
 
 using KeePassLib.Native;
 using KeePassLib.Utility;
@@ -137,7 +135,7 @@ namespace KeePassLib.Cryptography
 			pb = TimeUtil.PackTime(DateTime.Now);
 			ms.Write(pb, 0, pb.Length);
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (false && !KeePassLibSD && !KeePassRT)
 			// In try-catch for systems without GUI;
 			// https://sourceforge.net/p/keepass/discussion/329221/thread/20335b73/
 			try

@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.Diagnostics;
 using System.Reflection;
@@ -66,7 +65,7 @@ namespace KeePassLib.Translation
 			}
 		}
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (false && !KeePassLibSD && !KeePassRT)
 		private Form m_formEnglish = null;
 		[XmlIgnore]
 		public Form FormEnglish

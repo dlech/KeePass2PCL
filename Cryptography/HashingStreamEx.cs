@@ -90,7 +90,7 @@ namespace KeePassLib.Cryptography
 			if((!m_hash.CanReuseTransform) || (!m_hash.CanTransformMultipleBlocks) ||
 				(m_hash.InputBlockSize != 1) || (m_hash.OutputBlockSize != 1))
 			{
-#if DEBUG
+#if false && DEBUG
 				MessageService.ShowWarning("Broken HashAlgorithm object in HashingStreamEx.");
 #endif
 				m_hash = null;
