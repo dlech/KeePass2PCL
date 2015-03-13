@@ -98,13 +98,13 @@ namespace KeePassLib.Utility
 			return true;
 		}
 
-#if false
+#if !KeePass2PCL
 		public static void ApplyTo(Form f)
 		{
 			if(!MonoWorkarounds.IsRequired()) return;
 			if(f == null) { Debug.Assert(false); return; }
 
-#if (false && !KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT)
 			f.HandleCreated += MonoWorkarounds.OnFormHandleCreated;
 			SetWmClass(f);
 
@@ -117,7 +117,7 @@ namespace KeePassLib.Utility
 			if(!MonoWorkarounds.IsRequired()) return;
 			if(f == null) { Debug.Assert(false); return; }
 
-#if (false && !KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 			f.HandleCreated -= MonoWorkarounds.OnFormHandleCreated;
 
 			ApplyToControlsRec(f.Controls, f, MonoWorkarounds.ReleaseControl);
@@ -125,7 +125,7 @@ namespace KeePassLib.Utility
 		}
 #endif
 
-#if (false && !KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 		private delegate void MwaControlHandler(Control c, Form fContext);
 
 		private static void ApplyToControlsRec(Control.ControlCollection cc,

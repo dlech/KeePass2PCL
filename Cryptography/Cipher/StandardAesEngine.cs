@@ -24,6 +24,10 @@ using System.IO;
 using System.Security;
 using System.Diagnostics;
 
+#if KeePass2PCL
+using PCLCrypto;
+#else
+
 #if !KeePassRT
 using System.Security.Cryptography;
 #else
@@ -35,6 +39,8 @@ using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Crypto.Parameters;
 #endif
 
+#endif
+
 using KeePassLib.Resources;
 
 namespace KeePassLib.Cryptography.Cipher
@@ -44,7 +50,7 @@ namespace KeePassLib.Cryptography.Cipher
 	/// </summary>
 	public sealed class StandardAesEngine : ICipherEngine
 	{
-#if !KeePassRT
+#if !KeePass2PCL && !KeePassRT
 		private const CipherMode m_rCipherMode = CipherMode.CBC;
 		private const PaddingMode m_rCipherPadding = PaddingMode.PKCS7;
 #endif
@@ -117,6 +123,18 @@ namespace KeePassLib.Cryptography.Cipher
 			byte[] pbLocalKey = new byte[32];
 			Array.Copy(pbKey, pbLocalKey, 32);
 
+#if KeePass2PCL
+			var provider = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesCbcPkcs7);
+			var key = provider.CreateSymmetricKey(pbLocalKey);
+			if (bEncrypt) {
+				var encryptor = WinRTCrypto.CryptographicEngine.CreateEncryptor(key, pbLocalIV);
+				return new CryptoStream(s, encryptor, CryptoStreamMode.Write);
+			} else {
+				var decryptor = WinRTCrypto.CryptographicEngine.CreateDecryptor(key, pbLocalIV);
+				return new CryptoStream(s, decryptor, CryptoStreamMode.Read);
+			}
+#else
+
 #if !KeePassRT
 			RijndaelManaged r = new RijndaelManaged();
 			if(r.BlockSize != 128) // AES block size
@@ -149,6 +167,8 @@ namespace KeePassLib.Cryptography.Cipher
 			IBufferedCipher cpRead = (bEncrypt ? null : bc);
 			IBufferedCipher cpWrite = (bEncrypt ? bc : null);
 			return new CipherStream(s, cpRead, cpWrite);
+#endif
+
 #endif
 		}
 

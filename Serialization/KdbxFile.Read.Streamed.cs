@@ -21,7 +21,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Security;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 using System.Drawing;
 using System.Xml;
 using System.IO;
@@ -100,11 +104,15 @@ namespace KeePassLib.Serialization
 			xrs.IgnoreProcessingInstructions = true;
 			xrs.IgnoreWhitespace = true;
 
+#if !KeePass2PCL
+			// these are default values, so no need to set them
 #if !KeePassRT
 #if !KeePassLibSD
 			xrs.ProhibitDtd = true;
 #endif
 			xrs.ValidationType = ValidationType.None;
+#endif
+
 #endif
 
 			return xrs;
@@ -687,13 +695,21 @@ namespace KeePassLib.Serialization
 			}
 
 			m_bReadNextNode = false; // ReadElementString skips end tag
+#if KeePass2PCL
+			return xr.ReadElementContentAsString();
+#else
 			return xr.ReadElementString();
+#endif
 		}
 
 		private string ReadStringRaw(XmlReader xr)
 		{
 			m_bReadNextNode = false; // ReadElementString skips end tag
+#if KeePass2PCL
+			return xr.ReadElementContentAsString();
+#else
 			return xr.ReadElementString();
+#endif
 		}
 
 		private bool ReadBool(XmlReader xr, bool bDefault)

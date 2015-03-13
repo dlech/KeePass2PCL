@@ -20,7 +20,11 @@
 using System;
 using System.Collections.Generic;
 using System.Security;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 using System.Text;
 using System.Globalization;
 using System.Diagnostics;
@@ -59,8 +63,10 @@ namespace KeePassLib.Cryptography
 
 			TestRijndael();
 			TestSalsa20();
-			
+
+#if !KeePass2PCL
 			TestNativeKeyTransform();
+#endif
 			
 			TestHmacOtp();
 
@@ -76,7 +82,7 @@ namespace KeePassLib.Cryptography
 
 		internal static void TestFipsComplianceProblems()
 		{
-#if !KeePassRT
+#if !KeePass2PCL && !KeePassRT
 			try { new RijndaelManaged(); }
 			catch(Exception exAes)
 			{
@@ -93,7 +99,7 @@ namespace KeePassLib.Cryptography
 
 		private static void TestRijndael()
 		{
-#if !KeePassRT
+#if !KeePass2PCL && !KeePassRT
 			// Test vector (official ECB test vector #356)
 			byte[] pbIV = new byte[16];
 			byte[] pbTestKey = new byte[32];
@@ -205,6 +211,7 @@ namespace KeePassLib.Cryptography
 		}
 #endif
 
+#if !KeePass2PCL
 		private static void TestNativeKeyTransform()
 		{
 #if DEBUG
@@ -226,6 +233,7 @@ namespace KeePassLib.Cryptography
 				throw new SecurityException("Native transform.");
 #endif
 		}
+#endif
 
 		private static void TestMemUtil()
 		{
@@ -263,31 +271,31 @@ namespace KeePassLib.Cryptography
 				throw new InvalidOperationException("MemUtil-7");
 
 			byte[] pbRes = MemUtil.ParseBase32("MY======");
-			byte[] pbExp = Encoding.ASCII.GetBytes("f");
+			byte[] pbExp = Encoding.UTF8.GetBytes("f");
 			if(!MemUtil.ArraysEqual(pbRes, pbExp)) throw new Exception("Base32-1");
 
 			pbRes = MemUtil.ParseBase32("MZXQ====");
-			pbExp = Encoding.ASCII.GetBytes("fo");
+			pbExp = Encoding.UTF8.GetBytes("fo");
 			if(!MemUtil.ArraysEqual(pbRes, pbExp)) throw new Exception("Base32-2");
 
 			pbRes = MemUtil.ParseBase32("MZXW6===");
-			pbExp = Encoding.ASCII.GetBytes("foo");
+			pbExp = Encoding.UTF8.GetBytes("foo");
 			if(!MemUtil.ArraysEqual(pbRes, pbExp)) throw new Exception("Base32-3");
 
 			pbRes = MemUtil.ParseBase32("MZXW6YQ=");
-			pbExp = Encoding.ASCII.GetBytes("foob");
+			pbExp = Encoding.UTF8.GetBytes("foob");
 			if(!MemUtil.ArraysEqual(pbRes, pbExp)) throw new Exception("Base32-4");
 
 			pbRes = MemUtil.ParseBase32("MZXW6YTB");
-			pbExp = Encoding.ASCII.GetBytes("fooba");
+			pbExp = Encoding.UTF8.GetBytes("fooba");
 			if(!MemUtil.ArraysEqual(pbRes, pbExp)) throw new Exception("Base32-5");
 
 			pbRes = MemUtil.ParseBase32("MZXW6YTBOI======");
-			pbExp = Encoding.ASCII.GetBytes("foobar");
+			pbExp = Encoding.UTF8.GetBytes("foobar");
 			if(!MemUtil.ArraysEqual(pbRes, pbExp)) throw new Exception("Base32-6");
 
 			pbRes = MemUtil.ParseBase32("JNSXSIDQOJXXM2LEMVZCAYTBONSWIIDPNYQG63TFFV2GS3LFEBYGC43TO5XXEZDTFY======");
-			pbExp = Encoding.ASCII.GetBytes("Key provider based on one-time passwords.");
+			pbExp = Encoding.UTF8.GetBytes("Key provider based on one-time passwords.");
 			if(!MemUtil.ArraysEqual(pbRes, pbExp)) throw new Exception("Base32-7");
 #endif
 		}

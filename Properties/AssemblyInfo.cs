@@ -22,6 +22,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General assembly properties
+
+
 [assembly: AssemblyTitle("KeePassLib")]
 [assembly: AssemblyDescription("KeePass Password Management Library")]
 [assembly: AssemblyConfiguration("")]
@@ -34,8 +36,10 @@ using System.Runtime.InteropServices;
 // COM settings
 [assembly: ComVisible(false)]
 
+#if !KeePass2PCL
 // Assembly GUID
 [assembly: Guid("395f6eec-a1e0-4438-aa82-b75099348134")]
+#endif
 
 // Assembly version information
 [assembly: AssemblyVersion("2.28.0.*")]

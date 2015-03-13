@@ -20,7 +20,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 using System.Globalization;
 
 using KeePassLib.Utility;
@@ -42,8 +46,14 @@ namespace KeePassLib.Cryptography
 			byte[] pbText = MemUtil.UInt64ToBytes(uFactor);
 			Array.Reverse(pbText); // Big-Endian
 
+#if KeePass2PCL
+			var hsha1 = WinRTCrypto.MacAlgorithmProvider.OpenAlgorithm(MacAlgorithm.HmacSha1).CreateHash(pbSecret);
+			hsha1.Append(pbText);
+			var pbHash = hsha1.GetValueAndReset();
+#else
 			HMACSHA1 hsha1 = new HMACSHA1(pbSecret);
 			byte[] pbHash = hsha1.ComputeHash(pbText);
+#endif
 
 			uint uOffset = (uint)(pbHash[pbHash.Length - 1] & 0xF);
 			if((iTruncationOffset >= 0) && (iTruncationOffset < (pbHash.Length - 4)))

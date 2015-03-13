@@ -889,7 +889,7 @@ namespace KeePassLib
 
 			if(m_bCompareNaturally) return StrUtil.CompareNaturally(strA, strB);
 
-#if KeePassRT
+#if KeePass2PCL || KeePassRT
 			return string.Compare(strA, strB, m_bCaseInsensitive ?
 				StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture);
 #else

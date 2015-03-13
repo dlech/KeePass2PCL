@@ -21,7 +21,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 
 using KeePassLib.Security;
 using KeePassLib.Utility;
@@ -55,8 +59,13 @@ namespace KeePassLib.Keys
 
 			if(bPerformHash)
 			{
+#if KeePass2PCL
+				var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+				var pbRaw = sha256.HashData(pbKeyData);
+#else
 				SHA256Managed sha256 = new SHA256Managed();
 				byte[] pbRaw = sha256.ComputeHash(pbKeyData);
+#endif
 				m_pbKey = new ProtectedBinary(true, pbRaw);
 			}
 			else m_pbKey = new ProtectedBinary(true, pbKeyData);

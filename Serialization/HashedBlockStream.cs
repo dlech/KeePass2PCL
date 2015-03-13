@@ -19,7 +19,12 @@
 
 using System;
 using System.IO;
+#if KeePass2PCL
+using System.Linq;
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 using System.Diagnostics;
 using System.Text;
 
@@ -129,7 +134,7 @@ namespace KeePassLib.Serialization
 			if(m_bWriting) m_bwOutput.Flush();
 		}
 
-#if KeePassRT
+#if KeePass2PCL || KeePassRT
 		protected override void Dispose(bool disposing)
 		{
 			if(!disposing) return;
@@ -141,7 +146,7 @@ namespace KeePassLib.Serialization
 			{
 				if(m_bWriting == false) // Reading mode
 				{
-					m_brInput.Close();
+					m_brInput.Dispose();
 					m_brInput = null;
 				}
 				else // Writing mode
@@ -155,11 +160,11 @@ namespace KeePassLib.Serialization
 					}
 
 					Flush();
-					m_bwOutput.Close();
+					m_bwOutput.Dispose();
 					m_bwOutput = null;
 				}
 
-				m_sBaseStream.Close();
+				m_sBaseStream.Dispose();
 				m_sBaseStream = null;
 			}
 		}
@@ -243,8 +248,13 @@ namespace KeePassLib.Serialization
 
 			if(m_bVerify)
 			{
+#if KeePass2PCL
+				var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+				var pbComputedHash = sha256.HashData(m_pbBuffer);
+#else
 				SHA256Managed sha256 = new SHA256Managed();
 				byte[] pbComputedHash = sha256.ComputeHash(m_pbBuffer);
+#endif
 				if((pbComputedHash == null) || (pbComputedHash.Length != 32))
 					throw new InvalidOperationException();
 
@@ -285,6 +295,11 @@ namespace KeePassLib.Serialization
 
 			if(m_nBufferPos > 0)
 			{
+#if KeePass2PCL
+				var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+				var pbHash = sha256.HashData(m_pbBuffer.Where((x, i) => i < m_nBufferPos).ToArray());
+#else
+
 				SHA256Managed sha256 = new SHA256Managed();
 
 #if !KeePassLibSD
@@ -299,6 +314,8 @@ namespace KeePassLib.Serialization
 					Array.Copy(m_pbBuffer, 0, pbData, 0, m_nBufferPos);
 					pbHash = sha256.ComputeHash(pbData);
 				}
+#endif
+
 #endif
 
 				m_bwOutput.Write(pbHash);

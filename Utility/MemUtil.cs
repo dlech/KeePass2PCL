@@ -20,7 +20,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 using System.Diagnostics;
 using System.IO;
 
@@ -491,11 +495,11 @@ namespace KeePassLib.Utility
 			GZipStream gz = new GZipStream(msCompressed, CompressionMode.Compress);
 			MemoryStream msSource = new MemoryStream(pbData, false);
 			MemUtil.CopyStream(msSource, gz);
-			gz.Close();
-			msSource.Close();
+			gz.Dispose();
+			msSource.Dispose();
 
 			byte[] pbCompressed = msCompressed.ToArray();
-			msCompressed.Close();
+			msCompressed.Dispose();
 			return pbCompressed;
 		}
 
@@ -508,11 +512,11 @@ namespace KeePassLib.Utility
 			GZipStream gz = new GZipStream(msCompressed, CompressionMode.Decompress);
 			MemoryStream msData = new MemoryStream();
 			MemUtil.CopyStream(gz, msData);
-			gz.Close();
-			msCompressed.Close();
+			gz.Dispose();
+			msCompressed.Dispose();
 
 			byte[] pbData = msData.ToArray();
-			msData.Close();
+			msData.Dispose();
 			return pbData;
 		}
 

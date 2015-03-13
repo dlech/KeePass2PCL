@@ -318,7 +318,7 @@ namespace KeePassLib
 			set { m_bSearchInTags = value; }
 		}
 
-#if KeePassRT
+#if KeePass2PCL || KeePassRT
 		private StringComparison m_scType = StringComparison.OrdinalIgnoreCase;
 #else
 		private StringComparison m_scType = StringComparison.InvariantCultureIgnoreCase;

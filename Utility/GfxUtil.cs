@@ -21,8 +21,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+#if KeePass2PCL
+using Splat;
+#else
 using System.Drawing;
 using System.Drawing.Imaging;
+#endif
 using System.Diagnostics;
 
 namespace KeePassLib.Utility
@@ -35,6 +39,13 @@ namespace KeePassLib.Utility
 			MemoryStream ms = new MemoryStream(pb, false);
 			try { return Image.FromStream(ms); }
 			finally { ms.Close(); }
+		}
+#elif KeePass2PCL
+		public static IBitmap LoadImage(byte[] pb)
+		{
+			using (var ms = new MemoryStream(pb, false)) {
+				return BitmapLoader.Current.Load(ms, null, null).Result;
+			}
 		}
 #else
 		public static Image LoadImage(byte[] pb)

@@ -21,7 +21,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 using System.Diagnostics;
 
 using KeePassLib.Utility;
@@ -32,7 +36,11 @@ namespace KeePassLib.Cryptography
 	{
 		private Stream m_sBaseStream;
 		private bool m_bWriting;
+#if KeePass2PCL
+		private ICryptoTransform m_hash;
+#else
 		private HashAlgorithm m_hash;
+#endif
 
 		private byte[] m_pbFinalHash = null;
 
@@ -67,14 +75,19 @@ namespace KeePassLib.Cryptography
 			set { throw new NotSupportedException(); }
 		}
 
+#if KeePass2PCL
+		public HashingStreamEx(Stream sBaseStream, bool bWriting, HashAlgorithm? hashAlgorithm)
+#else
 		public HashingStreamEx(Stream sBaseStream, bool bWriting, HashAlgorithm hashAlgorithm)
+#endif
 		{
 			if(sBaseStream == null) throw new ArgumentNullException("sBaseStream");
 
 			m_sBaseStream = sBaseStream;
 			m_bWriting = bWriting;
-
-#if !KeePassLibSD
+#if KeePass2PCL
+			m_hash = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(hashAlgorithm ?? HashAlgorithm.Sha256).CreateHash();
+#elif !KeePassLibSD
 			m_hash = (hashAlgorithm ?? new SHA256Managed());
 #else // KeePassLibSD
 			m_hash = null;
@@ -102,7 +115,7 @@ namespace KeePassLib.Cryptography
 			m_sBaseStream.Flush();
 		}
 
-#if KeePassRT
+#if KeePass2PCL || KeePassRT
 		protected override void Dispose(bool disposing)
 		{
 			if(!disposing) return;
@@ -114,16 +127,20 @@ namespace KeePassLib.Cryptography
 			{
 				try
 				{
+#if KeePass2PCL
+					m_pbFinalHash = m_hash.TransformFinalBlock(new byte[0], 0, 0);
+#else
 					m_hash.TransformFinalBlock(new byte[0], 0, 0);
 
 					m_pbFinalHash = m_hash.Hash;
+#endif
 				}
 				catch(Exception) { Debug.Assert(false); }
 
 				m_hash = null;
 			}
 
-			m_sBaseStream.Close();
+			m_sBaseStream.Dispose();
 		}
 
 		public override long Seek(long lOffset, SeekOrigin soOrigin)

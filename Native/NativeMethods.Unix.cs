@@ -28,7 +28,7 @@ namespace KeePassLib.Native
 {
 	internal static partial class NativeMethods
 	{
-#if (false && !KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 		[StructLayout(LayoutKind.Sequential)]
 		private struct XClassHint
 		{

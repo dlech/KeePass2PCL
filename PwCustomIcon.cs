@@ -19,7 +19,11 @@
 
 using System;
 using System.Diagnostics;
+#if KeePass2PCL
+using Splat;
+#else
 using System.Drawing;
+#endif
 using System.IO;
 
 using KeePassLib.Utility;
@@ -33,7 +37,11 @@ namespace KeePassLib
 	{
 		private PwUuid m_pwUuid;
 		private byte[] m_pbImageDataPng;
+#if KeePass2PCL
+		private IBitmap m_pCachedImage;
+#else
 		private Image m_pCachedImage;
+#endif
 
 		public PwUuid Uuid
 		{
@@ -45,7 +53,11 @@ namespace KeePassLib
 			get { return m_pbImageDataPng; }
 		}
 
+#if KeePass2PCL
+		public IBitmap Image
+#else
 		public Image Image
+#endif
 		{
 			get { return m_pCachedImage; }
 		}

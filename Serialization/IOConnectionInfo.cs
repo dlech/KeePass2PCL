@@ -26,6 +26,10 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using System.Diagnostics;
 
+#if KeePass2PCL
+using PCLStorage;
+#endif
+
 using KeePassLib.Interfaces;
 using KeePassLib.Utility;
 
@@ -291,7 +295,12 @@ namespace KeePassLib.Serialization
 
 		public bool CanProbablyAccess()
 		{
+#if KeePass2PCL
+			if(IsLocalFile())
+				return (FileSystem.Current.GetFileFromPathAsync(m_strUrl).Result != null);
+#else
 			if(IsLocalFile()) return File.Exists(m_strUrl);
+#endif
 
 			return true;
 		}

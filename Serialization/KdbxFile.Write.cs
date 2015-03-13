@@ -23,7 +23,11 @@ using System.Text;
 using System.IO;
 using System.Xml;
 using System.Security;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 using System.Drawing;
 using System.Globalization;
 using System.Diagnostics;
@@ -120,22 +124,31 @@ namespace KeePassLib.Serialization
 					writerStream = hashedStream;
 				else { Debug.Assert(false); throw new FormatException("KdbFormat"); }
 
+#if KeePass2PCL
+				var settings = new XmlWriterSettings() {
+					Encoding = encNoBom,
+					Indent = true,
+					IndentChars = "\t",
+				};
+				m_xmlWriter = XmlWriter.Create(writerStream, settings);
+#else
 				m_xmlWriter = new XmlTextWriter(writerStream, encNoBom);
+#endif
 				WriteDocument(pgDataSource);
 
 				m_xmlWriter.Flush();
-				m_xmlWriter.Close();
-				writerStream.Close();
+				m_xmlWriter.Dispose();
+				writerStream.Dispose();
 			}
 			finally { CommonCleanUpWrite(sSaveTo, hashedStream); }
 		}
 
 		private void CommonCleanUpWrite(Stream sSaveTo, HashingStreamEx hashedStream)
 		{
-			hashedStream.Close();
+			hashedStream.Dispose();
 			m_pbHashOfFileOnDisk = hashedStream.Hash;
 
-			sSaveTo.Close();
+			sSaveTo.Dispose();
 
 			m_xmlWriter = null;
 			m_pbHashOfHeader = null;
@@ -172,10 +185,15 @@ namespace KeePassLib.Serialization
 				(byte)'\r', (byte)'\n', (byte)'\r', (byte)'\n' });
 
 			byte[] pbHeader = ms.ToArray();
-			ms.Close();
+			ms.Dispose();
 
+#if KeePass2PCL
+			var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+			m_pbHashOfHeader = sha256.HashData(pbHeader);
+#else
 			SHA256Managed sha256 = new SHA256Managed();
 			m_pbHashOfHeader = sha256.ComputeHash(pbHeader);
+#endif
 
 			s.Write(pbHeader, 0, pbHeader.Length);
 			s.Flush();
@@ -216,10 +234,15 @@ namespace KeePassLib.Serialization
 				throw new SecurityException(KLRes.InvalidCompositeKey);
 			ms.Write(pKey32, 0, 32);
 
+#if KeePass2PCL
+			var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+			var aesKey = sha256.HashData(ms.ToArray());
+#else
 			SHA256Managed sha256 = new SHA256Managed();
 			byte[] aesKey = sha256.ComputeHash(ms.ToArray());
+#endif
 			
-			ms.Close();
+			ms.Dispose();
 			Array.Clear(pKey32, 0, 32);
 
 			Debug.Assert(CipherPool.GlobalPool != null);
@@ -240,9 +263,11 @@ namespace KeePassLib.Serialization
 
 			BinPoolBuild(pgRoot);
 
+#if !KeePass2PCL
 			m_xmlWriter.Formatting = Formatting.Indented;
 			m_xmlWriter.IndentChar = '\t';
 			m_xmlWriter.Indentation = 1;
+#endif
 
 			m_xmlWriter.WriteStartDocument(true);
 			m_xmlWriter.WriteStartElement(ElemDocNode);

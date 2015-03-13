@@ -19,7 +19,11 @@
 
 using System;
 using System.Diagnostics;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 
 using KeePassLib.Cryptography.Cipher;
 
@@ -111,8 +115,13 @@ namespace KeePassLib.Cryptography
 			}
 			else if(genAlgorithm == CrsAlgorithm.Salsa20)
 			{
+#if KeePass2PCL
+				var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+				var pbKey32 = sha256.HashData(pbKey);
+#else
 				SHA256Managed sha256 = new SHA256Managed();
 				byte[] pbKey32 = sha256.ComputeHash(pbKey);
+#endif
 				byte[] pbIV = new byte[8] { 0xE8, 0x30, 0x09, 0x4B,
 					0x97, 0x20, 0x5D, 0x2A }; // Unique constant
 

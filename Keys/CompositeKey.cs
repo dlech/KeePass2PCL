@@ -22,7 +22,11 @@ using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 
 #if KeePassRT
 using Org.BouncyCastle.Crypto.Engines;
@@ -108,7 +112,7 @@ namespace KeePassLib.Keys
 			return m_vUserKeys.Remove(pKey);
 		}
 
-#if !KeePassRT
+#if !KeePass2PCL && !KeePassRT
 		/// <summary>
 		/// Test whether the composite key contains a specific type of
 		/// user keys (password, key file, ...). If at least one user
@@ -173,9 +177,14 @@ namespace KeePassLib.Keys
 				}
 			}
 
+#if KeePass2PCL
+			var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+			var pbHash = sha256.HashData(ms.ToArray());
+#else
 			SHA256Managed sha256 = new SHA256Managed();
 			byte[] pbHash = sha256.ComputeHash(ms.ToArray());
-			ms.Close();
+#endif
+			ms.Dispose();
 			return pbHash;
 		}
 
@@ -225,6 +234,7 @@ namespace KeePassLib.Keys
 
 		private void ValidateUserKeys()
 		{
+#if !KeePass2PCL
 			int nAccounts = 0;
 
 			foreach(IUserKey uKey in m_vUserKeys)
@@ -238,6 +248,7 @@ namespace KeePassLib.Keys
 				Debug.Assert(false);
 				throw new InvalidOperationException();
 			}
+#endif
 		}
 
 		/// <summary>
@@ -263,15 +274,22 @@ namespace KeePassLib.Keys
 			byte[] pbNewKey = new byte[32];
 			Array.Copy(pbOriginalKey32, pbNewKey, pbNewKey.Length);
 
+#if !KeePass2PCL
 			// Try to use the native library first
 			if(NativeLib.TransformKey256(pbNewKey, pbKeySeed32, uNumRounds))
 				return (new SHA256Managed()).ComputeHash(pbNewKey);
+#endif
 
 			if(TransformKeyManaged(pbNewKey, pbKeySeed32, uNumRounds) == false)
 				return null;
 
+#if KeePass2PCL
+			var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+			return sha256.HashData(pbNewKey);
+#else
 			SHA256Managed sha256 = new SHA256Managed();
 			return sha256.ComputeHash(pbNewKey);
+#endif
 		}
 
 		public static bool TransformKeyManaged(byte[] pbNewKey32, byte[] pbKeySeed32,
@@ -288,6 +306,11 @@ namespace KeePassLib.Keys
 				aes.ProcessBlock(pbNewKey32, 16, pbNewKey32, 16);
 			}
 #else
+#if KeePass2PCL
+			var aes = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesEcb);
+			var key = aes.CreateSymmetricKey(pbKeySeed32);
+			var iCrypt = WinRTCrypto.CryptographicEngine.CreateEncryptor(key);
+#else
 			byte[] pbIV = new byte[16];
 			Array.Clear(pbIV, 0, pbIV.Length);
 
@@ -303,6 +326,7 @@ namespace KeePassLib.Keys
 			r.KeySize = 256;
 			r.Key = pbKeySeed32;
 			ICryptoTransform iCrypt = r.CreateEncryptor();
+#endif
 
 			// !iCrypt.CanReuseTransform -- doesn't work with Mono
 			if((iCrypt == null) || (iCrypt.InputBlockSize != 16) ||
@@ -340,9 +364,11 @@ namespace KeePassLib.Keys
 		{
 			ulong uRounds;
 
+#if !KeePass2PCL
 			// Try native method
 			if(NativeLib.TransformKeyBenchmark256(uMilliseconds, out uRounds))
 				return uRounds;
+#endif
 
 			byte[] pbKey = new byte[32];
 			byte[] pbNewKey = new byte[32];
@@ -356,6 +382,11 @@ namespace KeePassLib.Keys
 			KeyParameter kp = new KeyParameter(pbKey);
 			AesEngine aes = new AesEngine();
 			aes.Init(true, kp);
+#else
+#if KeePass2PCL
+			var aes = WinRTCrypto.SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithm.AesEcb);
+			var key = aes.CreateSymmetricKey(pbKey);
+			var iCrypt = WinRTCrypto.CryptographicEngine.CreateEncryptor(key);
 #else
 			byte[] pbIV = new byte[16];
 			Array.Clear(pbIV, 0, pbIV.Length);
@@ -372,6 +403,7 @@ namespace KeePassLib.Keys
 			r.KeySize = 256;
 			r.Key = pbKey;
 			ICryptoTransform iCrypt = r.CreateEncryptor();
+#endif
 
 			// !iCrypt.CanReuseTransform -- doesn't work with Mono
 			if((iCrypt == null) || (iCrypt.InputBlockSize != 16) ||

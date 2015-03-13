@@ -23,7 +23,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 using System.Security.AccessControl;
 #endif
 
@@ -59,12 +59,15 @@ namespace KeePassLib.Serialization
 			m_bTransacted = bTransacted;
 			m_iocBase = iocBaseFile.CloneDeep();
 
+// KeePass2PCL is currently targeting .NET 4.5
+#if !KeePass2PCL
 			// Prevent transactions for FTP URLs under .NET 4.0 in order to
 			// avoid/workaround .NET bug 621450:
 			// https://connect.microsoft.com/VisualStudio/feedback/details/621450/problem-renaming-file-on-ftp-server-using-ftpwebrequest-in-net-framework-4-0-vs2010-only
 			if(m_iocBase.Path.StartsWith("ftp:", StrUtil.CaseIgnoreCmp) &&
 				(Environment.Version.Major >= 4) && !NativeLib.IsUnix())
 				m_bTransacted = false;
+#endif
 
 			if(m_bTransacted)
 			{
@@ -99,14 +102,14 @@ namespace KeePassLib.Serialization
 		{
 			bool bMadeUnhidden = UrlUtil.UnhideFile(m_iocBase.Path);
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 			FileSecurity bkSecurity = null;
 			bool bEfsEncrypted = false;
 #endif
 
 			if(IOConnection.FileExists(m_iocBase))
 			{
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 				if(m_iocBase.IsLocalFile())
 				{
 					try
@@ -128,7 +131,7 @@ namespace KeePassLib.Serialization
 
 			IOConnection.RenameFile(m_iocTemp, m_iocBase);
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 			if(m_iocBase.IsLocalFile())
 			{
 				try

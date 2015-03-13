@@ -21,7 +21,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+#if KeePass2PCL
+using System.Threading.Tasks;
+#else
 using System.Threading;
+#endif
 using System.Diagnostics;
 
 using KeePassLib.Cryptography;
@@ -127,7 +131,7 @@ namespace KeePassLib.Serialization
 					if(s == null) return null;
 					StreamReader sr = new StreamReader(s, StrUtil.Utf8);
 					string str = sr.ReadToEnd();
-					sr.Close();
+					sr.Dispose();
 					if(str == null) { Debug.Assert(false); return null; }
 
 					str = StrUtil.NormalizeNewLines(str, false);
@@ -139,7 +143,7 @@ namespace KeePassLib.Serialization
 				}
 				catch(FileNotFoundException) { }
 				catch(Exception) { Debug.Assert(false); }
-				finally { if(s != null) s.Close(); }
+				finally { if(s != null) s.Dispose(); }
 
 				return null;
 			}
@@ -154,7 +158,7 @@ namespace KeePassLib.Serialization
 					byte[] pbID = CryptoRandom.Instance.GetRandomBytes(16);
 					string strTime = TimeUtil.SerializeUtc(DateTime.Now);
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 					lfi = new LockFileInfo(Convert.ToBase64String(pbID), strTime,
 						Environment.UserName, Environment.MachineName,
 						Environment.UserDomainName);
@@ -186,7 +190,7 @@ namespace KeePassLib.Serialization
 					if(s == null) throw new IOException(iocLockFile.GetDisplayName());
 					s.Write(pbFile, 0, pbFile.Length);
 				}
-				finally { if(s != null) s.Close(); }
+				finally { if(s != null) s.Dispose(); }
 
 				return lfi;
 			}
@@ -239,7 +243,12 @@ namespace KeePassLib.Serialization
 
 				if(bFileDeleted) break;
 
+#if KeePass2PCL
+				if(bDisposing)
+					Task.Delay(50).Wait();
+#else
 				if(bDisposing) Thread.Sleep(50);
+#endif
 			}
 
 			if(bDisposing && !bFileDeleted)

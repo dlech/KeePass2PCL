@@ -23,6 +23,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Drawing;
 
+#if KeePass2PCL
+using Splat;
+#endif
+
 using KeePassLib.Collections;
 using KeePassLib.Cryptography;
 using KeePassLib.Cryptography.Cipher;
@@ -587,7 +591,7 @@ namespace KeePassLib
 
 				Stream s = IOConnection.OpenRead(ioSource);
 				kdbx.Load(s, KdbxFormat.Default, slLogger);
-				s.Close();
+				s.Dispose();
 
 				m_pbHashOfLastIO = kdbx.HashOfFileOnDisk;
 				m_pbHashOfFileOnDisk = kdbx.HashOfFileOnDisk;
@@ -1463,7 +1467,11 @@ namespace KeePassLib
 		/// </summary>
 		/// <param name="pwIconId">ID of the icon.</param>
 		/// <returns>Image data.</returns>
+#if KeePass2PCL
+		public IBitmap GetCustomIcon(PwUuid pwIconId)
+#else
 		public Image GetCustomIcon(PwUuid pwIconId)
+#endif
 		{
 			int nIndex = GetCustomIconIndex(pwIconId);
 

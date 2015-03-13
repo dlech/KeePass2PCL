@@ -65,7 +65,7 @@ namespace KeePassLib.Translation
 			}
 		}
 
-#if (false && !KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 		private Form m_formEnglish = null;
 		[XmlIgnore]
 		public Form FormEnglish

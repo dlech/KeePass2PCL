@@ -29,6 +29,10 @@ using System.Diagnostics;
 using System.IO.Compression;
 #endif
 
+#if KeePass2PCL
+using PCLStorage;
+#endif
+
 using KeePassLib.Collections;
 using KeePassLib.Cryptography;
 using KeePassLib.Delegates;
@@ -191,7 +195,11 @@ namespace KeePassLib.Serialization
 
 		private PwDatabase m_pwDatabase; // Not null, see constructor
 
+#if KeePass2PCL
+		private XmlWriter m_xmlWriter = null;
+#else
 		private XmlTextWriter m_xmlWriter = null;
+#endif
 		private CryptoRandomStream m_randomStream = null;
 		private KdbxFormat m_format = KdbxFormat.Default;
 		private IStatusLogger m_slLogger = null;
@@ -375,9 +383,20 @@ namespace KeePassLib.Serialization
 
 				++iTry;
 			}
+#if KeePass2PCL
+			while(FileSystem.Current.GetFileFromPathAsync(strPath).Result != null);
+#else
 			while(File.Exists(strPath));
+#endif
 
-#if !KeePassLibSD
+#if KeePass2PCL
+			byte[] pbData = pb.ReadData();
+			var file = FileSystem.Current.GetFileFromPathAsync(strPath).Result;
+			using (var stream = file.OpenAsync(FileAccess.ReadAndWrite).Result) {
+				stream.Write (pbData, 0, pbData.Length);
+			}
+			MemUtil.ZeroByteArray(pbData);
+#elif !KeePassLibSD
 			byte[] pbData = pb.ReadData();
 			File.WriteAllBytes(strPath, pbData);
 			MemUtil.ZeroByteArray(pbData);

@@ -22,7 +22,14 @@ using System.Text;
 using System.IO;
 using System.Xml;
 using System.Security;
+#if KeePass2PCL
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 using System.Diagnostics;
 
 using KeePassLib.Cryptography;
@@ -131,8 +138,13 @@ namespace KeePassLib.Keys
 
 			if(pbKey == null)
 			{
+#if KeePass2PCL
+				var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+				pbKey = sha256.HashData(pbFileData);
+#else
 				SHA256Managed sha256 = new SHA256Managed();
 				pbKey = sha256.ComputeHash(pbFileData);
+#endif
 			}
 
 			return pbKey;
@@ -190,9 +202,14 @@ namespace KeePassLib.Keys
 				ms.Write(pbAdditionalEntropy, 0, pbAdditionalEntropy.Length);
 				ms.Write(pbKey32, 0, 32);
 
+#if KeePass2PCL
+				var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+				pbFinalKey32 = sha256.HashData(ms.ToArray());
+#else
 				SHA256Managed sha256 = new SHA256Managed();
 				pbFinalKey32 = sha256.ComputeHash(ms.ToArray());
-				ms.Close();
+#endif
+				ms.Dispose();
 			}
 
 			CreateXmlKeyFile(strFilePath, pbFinalKey32);
@@ -228,10 +245,38 @@ namespace KeePassLib.Keys
 
 			try
 			{
+#if KeePass2PCL
+
+				var doc = XDocument.Load(ms);
+
+				var el = doc.Root;
+
+				if((el == null) || !el.Name.Equals(RootElementName))
+					return null;
+				if(el.DescendantNodes().Count() < 2)
+					return null;
+
+				foreach(var xmlChild in el.Descendants())
+				{
+					if(xmlChild.Name == MetaElementName) { } // Ignore Meta
+					else if(xmlChild.BaseUri == KeyElementName)
+					{
+						foreach(var xmlKeyChild in xmlChild.Descendants())
+						{
+							if(xmlKeyChild.Name == KeyDataElementName)
+							{
+								if(pbKeyData == null)
+									pbKeyData = Convert.FromBase64String(xmlKeyChild.Value);
+							}
+						}
+					}
+				}
+#else
 				XmlDocument doc = new XmlDocument();
 				doc.Load(ms);
 
 				XmlElement el = doc.DocumentElement;
+
 				if((el == null) || !el.Name.Equals(RootElementName)) return null;
 				if(el.ChildNodes.Count < 2) return null;
 
@@ -250,9 +295,10 @@ namespace KeePassLib.Keys
 						}
 					}
 				}
+#endif
 			}
 			catch(Exception) { pbKeyData = null; }
-			finally { ms.Close(); }
+			finally { ms.Dispose(); }
 
 			return pbKeyData;
 		}
@@ -267,7 +313,12 @@ namespace KeePassLib.Keys
 			IOConnectionInfo ioc = IOConnectionInfo.FromPath(strFile);
 			Stream sOut = IOConnection.OpenWrite(ioc);
 
+#if KeePass2PCL
+			var settings = new XmlWriterSettings() { Encoding = StrUtil.Utf8 };
+			var xtw = XmlWriter.Create(sOut, settings);
+#else
 			XmlTextWriter xtw = new XmlTextWriter(sOut, StrUtil.Utf8);
+#endif
 
 			xtw.WriteStartDocument();
 			xtw.WriteWhitespace("\r\n");
@@ -297,9 +348,9 @@ namespace KeePassLib.Keys
 			xtw.WriteEndElement(); // RootElementName
 			xtw.WriteWhitespace("\r\n");
 			xtw.WriteEndDocument(); // End KeyFile
-			xtw.Close();
+			xtw.Dispose();
 
-			sOut.Close();
+			sOut.Dispose();
 		}
 	}
 }

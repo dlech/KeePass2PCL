@@ -24,7 +24,11 @@ using System.Text;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 using System.Globalization;
 using System.Diagnostics;
 
@@ -219,7 +223,7 @@ namespace KeePassLib.Utility
 				List<StrEncodingInfo> l = new List<StrEncodingInfo>();
 
 				l.Add(new StrEncodingInfo(StrEncodingType.Default,
-#if KeePassRT
+#if KeePass2PCL || KeePassRT
 					StrUtil.Utf8.WebName, StrUtil.Utf8, 1, null));
 #else
 #if !KeePassLibSD
@@ -230,7 +234,7 @@ namespace KeePassLib.Utility
 					Encoding.Default,
 					(uint)Encoding.Default.GetBytes("a").Length, null));
 #endif
-#if !KeePassRT
+#if !KeePass2PCL && !KeePassRT
 				l.Add(new StrEncodingInfo(StrEncodingType.Ascii,
 					"ASCII", Encoding.ASCII, 1, null));
 				l.Add(new StrEncodingInfo(StrEncodingType.Utf7,
@@ -244,7 +248,7 @@ namespace KeePassLib.Utility
 				l.Add(new StrEncodingInfo(StrEncodingType.Utf16BE,
 					"Unicode (UTF-16 BE)", new UnicodeEncoding(true, false),
 					2, new byte[] { 0xFE, 0xFF }));
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 				l.Add(new StrEncodingInfo(StrEncodingType.Utf32LE,
 					"Unicode (UTF-32 LE)", new UTF32Encoding(false, false),
 					4, new byte[] { 0xFF, 0xFE, 0x0, 0x0 }));
@@ -495,7 +499,7 @@ namespace KeePassLib.Utility
 			if(excp.StackTrace != null)
 				strText += excp.StackTrace + MessageService.NewLine;
 #if !KeePassLibSD
-#if !KeePassRT
+#if !KeePass2PCL && !KeePassRT
 			if(excp.TargetSite != null)
 				strText += excp.TargetSite.ToString() + MessageService.NewLine;
 #endif
@@ -521,7 +525,7 @@ namespace KeePassLib.Utility
 				if(excp.InnerException.StackTrace != null)
 					strText += excp.InnerException.StackTrace + MessageService.NewLine;
 #if !KeePassLibSD
-#if !KeePassRT
+#if !KeePass2PCL && !KeePassRT
 				if(excp.InnerException.TargetSite != null)
 					strText += excp.InnerException.TargetSite.ToString();
 #endif
@@ -774,7 +778,7 @@ namespace KeePassLib.Utility
 
 			if(m_rxNaturalSplit == null)
 				m_rxNaturalSplit = new Regex(@"([0-9]+)",
-#if KeePassRT
+#if KeePass2PCL || KeePassRT
 					RegexOptions.None);
 #else
 					RegexOptions.Compiled);
@@ -1188,7 +1192,7 @@ namespace KeePassLib.Utility
 				byte[] pbEnc = ProtectedData.Protect(pbPlain, m_pbOptEnt,
 					DataProtectionScope.CurrentUser);
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 				return Convert.ToBase64String(pbEnc, Base64FormattingOptions.None);
 #else
 				return Convert.ToBase64String(pbEnc);
@@ -1301,7 +1305,7 @@ namespace KeePassLib.Utility
 			Array.Reverse(pb);
 			for(int i = 0; i < pb.Length; ++i) pb[i] = (byte)(pb[i] ^ 0x65);
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 			return Convert.ToBase64String(pb, Base64FormattingOptions.None);
 #else
 			return Convert.ToBase64String(pb);
@@ -1461,7 +1465,7 @@ namespace KeePassLib.Utility
 
 			if(strMimeType == null) strMimeType = "application/octet-stream";
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 			return ("data:" + strMimeType + ";base64," + Convert.ToBase64String(
 				pbData, Base64FormattingOptions.None));
 #else
@@ -1492,7 +1496,7 @@ namespace KeePassLib.Utility
 
 			MemoryStream ms = new MemoryStream();
 
-#if KeePassRT
+#if KeePass2PCL || KeePassRT
 			Encoding enc = StrUtil.Utf8;
 #else
 			Encoding enc = Encoding.ASCII;
@@ -1509,7 +1513,7 @@ namespace KeePassLib.Utility
 			}
 
 			pb = ms.ToArray();
-			ms.Close();
+			ms.Dispose();
 			return pb;
 		}
 

@@ -20,7 +20,11 @@
 using System;
 using System.Text;
 using System.Diagnostics;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 
 using KeePassLib.Security;
 using KeePassLib.Utility;
@@ -68,8 +72,13 @@ namespace KeePassLib.Keys
 			Debug.Assert(pbPasswordUtf8 != null);
 			if(pbPasswordUtf8 == null) throw new ArgumentNullException("pbPasswordUtf8");
 
+#if KeePass2PCL
+			var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+			var pbRaw = sha256.HashData(pbPasswordUtf8);
+#else
 			SHA256Managed sha256 = new SHA256Managed();
 			byte[] pbRaw = sha256.ComputeHash(pbPasswordUtf8);
+#endif
 
 			m_psPassword = new ProtectedString(true, pbPasswordUtf8);
 			m_pbKeyData = new ProtectedBinary(true, pbRaw);

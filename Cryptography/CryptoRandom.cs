@@ -19,7 +19,11 @@
 
 using System;
 using System.Security;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 using System.IO;
 using System.Diagnostics;
 
@@ -37,7 +41,11 @@ namespace KeePassLib.Cryptography
 	{
 		private byte[] m_pbEntropyPool = new byte[64];
 		private uint m_uCounter;
+#if KeePass2PCL
+		private IRandomNumberGenerator m_rng = NetFxCrypto.RandomNumberGenerator;
+#else
 		private RNGCryptoServiceProvider m_rng = new RNGCryptoServiceProvider();
+#endif
 		private ulong m_uGeneratedBytesCount = 0;
 
 		private object m_oSyncRoot = new object();
@@ -98,12 +106,19 @@ namespace KeePassLib.Cryptography
 			byte[] pbNewData = pbEntropy;
 			if(pbEntropy.Length >= 64)
 			{
+#if KeePass2PCL
+				var shaNew = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha512);
+				pbNewData = shaNew.HashData(pbEntropy);
+#else
+
 #if !KeePassLibSD
 				SHA512Managed shaNew = new SHA512Managed();
 #else
 				SHA256Managed shaNew = new SHA256Managed();
 #endif
 				pbNewData = shaNew.ComputeHash(pbEntropy);
+
+#endif
 			}
 
 			MemoryStream ms = new MemoryStream();
@@ -113,6 +128,11 @@ namespace KeePassLib.Cryptography
 				ms.Write(pbNewData, 0, pbNewData.Length);
 
 				byte[] pbFinal = ms.ToArray();
+#if KeePass2PCL
+				var shaPool = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha512);
+				m_pbEntropyPool = shaPool.HashData(pbFinal);
+#else
+
 #if !KeePassLibSD
 				Debug.Assert(pbFinal.Length == (64 + pbNewData.Length));
 				SHA512Managed shaPool = new SHA512Managed();
@@ -120,8 +140,10 @@ namespace KeePassLib.Cryptography
 				SHA256Managed shaPool = new SHA256Managed();
 #endif
 				m_pbEntropyPool = shaPool.ComputeHash(pbFinal);
+
+#endif
 			}
-			ms.Close();
+			ms.Dispose();
 		}
 
 		private static byte[] GetSystemData(Random rWeak)
@@ -135,7 +157,7 @@ namespace KeePassLib.Cryptography
 			pb = TimeUtil.PackTime(DateTime.Now);
 			ms.Write(pb, 0, pb.Length);
 
-#if (false && !KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 			// In try-catch for systems without GUI;
 			// https://sourceforge.net/p/keepass/discussion/329221/thread/20335b73/
 			try
@@ -155,7 +177,7 @@ namespace KeePassLib.Cryptography
 			pb = MemUtil.UInt32ToBytes((uint)NativeLib.GetPlatformID());
 			ms.Write(pb, 0, pb.Length);
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 			Process p = null;
 			try
 			{
@@ -213,7 +235,7 @@ namespace KeePassLib.Cryptography
 			ms.Write(pb, 0, pb.Length);
 
 			byte[] pbAll = ms.ToArray();
-			ms.Close();
+			ms.Dispose();
 			return pbAll;
 		}
 
@@ -244,13 +266,18 @@ namespace KeePassLib.Cryptography
 				pbFinal = ms.ToArray();
 				Debug.Assert(pbFinal.Length == (m_pbEntropyPool.Length +
 					pbCounter.Length + pbCspRandom.Length));
-				ms.Close();
+				ms.Dispose();
 
 				m_uGeneratedBytesCount += 32;
 			}
 
+#if KeePass2PCL
+			var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+			return sha256.HashData(pbFinal);
+#else
 			SHA256Managed sha256 = new SHA256Managed();
 			return sha256.ComputeHash(pbFinal);
+#endif
 		}
 
 		/// <summary>
@@ -274,7 +301,7 @@ namespace KeePassLib.Cryptography
 
 				long lCopy = (long)((uRequestedBytes < 32) ? uRequestedBytes : 32);
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 				Array.Copy(pbRandom256, 0, pbRes, lPos, lCopy);
 #else
 				Array.Copy(pbRandom256, 0, pbRes, (int)lPos, (int)lCopy);

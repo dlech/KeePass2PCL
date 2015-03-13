@@ -23,7 +23,11 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Security;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 using System.Xml;
 
 #if !KeePassLibSD
@@ -146,23 +150,25 @@ namespace KeePassLib.Serialization
 				ReadXmlStreamed(readerStream, hashedStream);
 				// ReadXmlDom(readerStream);
 
-				readerStream.Close();
+				readerStream.Dispose();
 				// GC.KeepAlive(br);
 				// GC.KeepAlive(brDecrypted);
 			}
+#if !KeePass2PCL
 			catch(CryptographicException) // Thrown on invalid padding
 			{
 				throw new CryptographicException(KLRes.FileCorrupted);
 			}
+#endif
 			finally { CommonCleanUpRead(sSource, hashedStream); }
 		}
 
 		private void CommonCleanUpRead(Stream sSource, HashingStreamEx hashedStream)
 		{
-			hashedStream.Close();
+			hashedStream.Dispose();
 			m_pbHashOfFileOnDisk = hashedStream.Hash;
 
-			sSource.Close();
+			sSource.Dispose();
 
 			// Reset memory protection settings (to always use reasonable
 			// defaults)
@@ -212,9 +218,15 @@ namespace KeePassLib.Serialization
 
 			br.CopyDataTo = null;
 			byte[] pbHeader = msHeader.ToArray();
-			msHeader.Close();
+			msHeader.Dispose();
+
+#if KeePass2PCL
+			var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+			m_pbHashOfHeader = sha256.HashData(pbHeader);
+#else
 			SHA256Managed sha256 = new SHA256Managed();
 			m_pbHashOfHeader = sha256.ComputeHash(pbHeader);
+#endif
 		}
 
 		private bool ReadHeaderField(BinaryReaderEx brSource)
@@ -334,11 +346,16 @@ namespace KeePassLib.Serialization
 			if((pKey32 == null) || (pKey32.Length != 32))
 				throw new SecurityException(KLRes.InvalidCompositeKey);
 			ms.Write(pKey32, 0, 32);
-			
+
+#if KeePass2PCL
+			var sha256 = WinRTCrypto.HashAlgorithmProvider.OpenAlgorithm(HashAlgorithm.Sha256);
+			var aesKey = sha256.HashData(ms.ToArray());
+#else
 			SHA256Managed sha256 = new SHA256Managed();
 			byte[] aesKey = sha256.ComputeHash(ms.ToArray());
+#endif
 
-			ms.Close();
+			ms.Dispose();
 			Array.Clear(pKey32, 0, 32);
 
 			if((aesKey == null) || (aesKey.Length != 32))

@@ -18,7 +18,11 @@
 */
 
 using System;
+#if KeePass2PCL
+using PCLCrypto;
+#else
 using System.Security.Cryptography;
+#endif
 using System.Threading;
 using System.Diagnostics;
 
@@ -100,6 +104,7 @@ namespace KeePassLib.Security
 				}
 
 				ob = false;
+
 				try // Test whether ProtectedMemory is supported
 				{
 					// BlockSize * 3 in order to test encryption for multiple

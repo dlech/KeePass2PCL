@@ -24,6 +24,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Diagnostics;
 
+#if KeePass2PCL
+using PCLStorage;
+#endif
+
 using KeePassLib.Native;
 
 namespace KeePassLib.Utility
@@ -36,13 +40,17 @@ namespace KeePassLib.Utility
 	{
 		private static readonly char[] m_vDirSeps = new char[] {
 			'\\', '/', UrlUtil.LocalDirSepChar };
+#if !KeePass2PCL
 		private static readonly char[] m_vPathTrimCharsWs = new char[] {
 			'\"', ' ', '\t', '\r', '\n' };
+#endif
 
 		public static char LocalDirSepChar
 		{
 #if KeePassRT
 			get { return '\\'; }
+#elif KeePass2PCL
+			get { return PortablePath.DirectorySeparatorChar; }
 #else
 			get { return Path.DirectorySeparatorChar; }
 #endif
@@ -257,7 +265,7 @@ namespace KeePassLib.Utility
 
 		public static bool UnhideFile(string strFile)
 		{
-#if (KeePassLibSD || KeePassRT)
+#if (KeePass2PCL || KeePassLibSD || KeePassRT)
 			return false;
 #else
 			if(strFile == null) throw new ArgumentNullException("strFile");
@@ -277,7 +285,7 @@ namespace KeePassLib.Utility
 
 		public static bool HideFile(string strFile, bool bHide)
 		{
-#if (KeePassLibSD || KeePassRT)
+#if (KeePass2PCL || KeePassLibSD || KeePassRT)
 			return false;
 #else
 			if(strFile == null) throw new ArgumentNullException("strFile");
@@ -318,7 +326,7 @@ namespace KeePassLib.Utility
 					return strTargetFile;
 			}
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 			if(NativeLib.IsUnix())
 #endif
 			{
@@ -351,7 +359,7 @@ namespace KeePassLib.Utility
 				return sbRel.ToString();
 			}
 
-#if (!KeePassLibSD && !KeePassRT)
+#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 			try // Windows
 			{
 				const int nMaxPath = NativeMethods.MAX_PATH * 2;
@@ -447,6 +455,9 @@ namespace KeePassLib.Utility
 #if KeePassRT
 				var dirT = Windows.Storage.StorageFolder.GetFolderFromPathAsync(
 					strPath).AwaitEx();
+				str = dirT.Path;
+#elif KeePass2PCL
+				var dirT = FileSystem.Current.GetFolderFromPathAsync(strPath).Result;
 				str = dirT.Path;
 #else
 				str = Path.GetFullPath(strPath);
@@ -620,6 +631,7 @@ namespace KeePassLib.Utility
 			return false;
 		}
 
+#if !KeePass2PCL
 		public static string GetTempPath()
 		{
 			string strDir;
@@ -640,8 +652,9 @@ namespace KeePassLib.Utility
 
 			return strDir;
 		}
+#endif
 
-#if !KeePassLibSD
+#if !KeePass2PCL && !KeePassLibSD
 		// Structurally mostly equivalent to UrlUtil.GetFileInfos
 		public static List<string> GetFilePaths(string strDir, string strPattern,
 			SearchOption opt)
