@@ -31,8 +31,8 @@ using System.Diagnostics;
 using PCLStorage;
 #endif
 
-using KeePassLib.Interfaces;
-using KeePassLib.Utility;
+using KeePass2PCL.Interfaces;
+using KeePass2PCL.Utility;
 
 #if !KeePassLibSD
 using System.IO.Compression;
@@ -40,7 +40,7 @@ using System.IO.Compression;
 using ICSharpCode.SharpZipLib.GZip;
 #endif
 
-namespace KeePassLib.Translation
+namespace KeePass2PCL.Translation
 {
 	[XmlRoot("Translation")]
 	public sealed class KPTranslation

@@ -28,9 +28,9 @@ using System.Diagnostics;
 using PCLStorage;
 #endif
 
-using KeePassLib.Native;
+using KeePass2PCL.Native;
 
-namespace KeePassLib.Utility
+namespace KeePass2PCL.Utility
 {
 	/// <summary>
 	/// A class containing various static path utility helper methods (like

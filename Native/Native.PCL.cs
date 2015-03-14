@@ -2,7 +2,7 @@
 
 using PlatformID = System.UInt32;
 
-namespace KeePassLib.Native
+namespace KeePass2PCL.Native
 {
 	internal static class NativeLib
 	{

@@ -21,9 +21,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-using KeePassLib.Interfaces;
+using KeePass2PCL.Interfaces;
 
-namespace KeePassLib.Collections
+namespace KeePass2PCL.Collections
 {
 	[Flags]
 	public enum AutoTypeObfuscationOptions

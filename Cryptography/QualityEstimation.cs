@@ -22,10 +22,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 
-using KeePassLib.Cryptography.PasswordGenerator;
-using KeePassLib.Utility;
+using KeePass2PCL.Cryptography.PasswordGenerator;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Cryptography
+namespace KeePass2PCL.Cryptography
 {
 	/// <summary>
 	/// A class that offers static functions to estimate the quality of

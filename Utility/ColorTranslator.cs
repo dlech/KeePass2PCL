@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Drawing;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace KeePassLib.Utility
+namespace KeePass2PCL.Utility
 {
 	public static class ColorTranslator
 	{

@@ -34,7 +34,7 @@ using System.IO.Compression;
 using KeePassLibSD;
 #endif
 
-namespace KeePassLib.Utility
+namespace KeePass2PCL.Utility
 {
 	/// <summary>
 	/// Contains static buffer manipulation and string conversion routines.

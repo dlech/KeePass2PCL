@@ -38,10 +38,10 @@ using System.Security.Cryptography.X509Certificates;
 using PCLStorage;
 #endif
 
-using KeePassLib.Native;
-using KeePassLib.Utility;
+using KeePass2PCL.Native;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Serialization
+namespace KeePass2PCL.Serialization
 {
 #if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 	internal sealed class IOWebClient : WebClient

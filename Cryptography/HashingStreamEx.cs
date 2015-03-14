@@ -28,9 +28,9 @@ using System.Security.Cryptography;
 #endif
 using System.Diagnostics;
 
-using KeePassLib.Utility;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Cryptography
+namespace KeePass2PCL.Cryptography
 {
 	public sealed class HashingStreamEx : Stream
 	{

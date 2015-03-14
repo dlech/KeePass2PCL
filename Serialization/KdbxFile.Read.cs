@@ -36,14 +36,14 @@ using System.IO.Compression;
 using KeePassLibSD;
 #endif
 
-using KeePassLib.Cryptography;
-using KeePassLib.Cryptography.Cipher;
-using KeePassLib.Interfaces;
-using KeePassLib.Keys;
-using KeePassLib.Resources;
-using KeePassLib.Utility;
+using KeePass2PCL.Cryptography;
+using KeePass2PCL.Cryptography.Cipher;
+using KeePass2PCL.Interfaces;
+using KeePass2PCL.Keys;
+using KeePass2PCL.Resources;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Serialization
+namespace KeePass2PCL.Serialization
 {
 	/// <summary>
 	/// Serialization to KeePass KDBX files.

@@ -18,24 +18,19 @@
 */
 
 using System;
-#if KeePass2PCL
-using PCLCrypto;
-#else
-using System.Security.Cryptography;
-#endif
 using System.Threading;
 using System.Diagnostics;
 
-using KeePassLib.Cryptography;
-using KeePassLib.Cryptography.Cipher;
-using KeePassLib.Native;
-using KeePassLib.Utility;
+using KeePass2PCL.Cryptography;
+using KeePass2PCL.Cryptography.Cipher;
+using KeePass2PCL.Native;
+using KeePass2PCL.Utility;
 
 #if KeePassLibSD
 using KeePassLibSD;
 #endif
 
-namespace KeePassLib.Security
+namespace KeePass2PCL.Security
 {
 	[Flags]
 	public enum PbCryptFlags
@@ -104,7 +99,6 @@ namespace KeePassLib.Security
 				}
 
 				ob = false;
-
 				try // Test whether ProtectedMemory is supported
 				{
 					// BlockSize * 3 in order to test encryption for multiple

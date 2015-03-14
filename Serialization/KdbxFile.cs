@@ -33,14 +33,14 @@ using System.IO.Compression;
 using PCLStorage;
 #endif
 
-using KeePassLib.Collections;
-using KeePassLib.Cryptography;
-using KeePassLib.Delegates;
-using KeePassLib.Interfaces;
-using KeePassLib.Security;
-using KeePassLib.Utility;
+using KeePass2PCL.Collections;
+using KeePass2PCL.Cryptography;
+using KeePass2PCL.Delegates;
+using KeePass2PCL.Interfaces;
+using KeePass2PCL.Security;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Serialization
+namespace KeePass2PCL.Serialization
 {
 	/// <summary>
 	/// The <c>KdbxFile</c> class supports saving the data to various

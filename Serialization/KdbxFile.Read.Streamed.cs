@@ -21,26 +21,21 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Security;
-#if KeePass2PCL
-using PCLCrypto;
-#else
-using System.Security.Cryptography;
-#endif
 using System.Drawing;
 using System.Xml;
 using System.IO;
 using System.Diagnostics;
 
-using KeePassLib;
-using KeePassLib.Collections;
-using KeePassLib.Cryptography;
-using KeePassLib.Cryptography.Cipher;
-using KeePassLib.Interfaces;
-using KeePassLib.Resources;
-using KeePassLib.Security;
-using KeePassLib.Utility;
+using KeePass2PCL;
+using KeePass2PCL.Collections;
+using KeePass2PCL.Cryptography;
+using KeePass2PCL.Cryptography.Cipher;
+using KeePass2PCL.Interfaces;
+using KeePass2PCL.Resources;
+using KeePass2PCL.Security;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Serialization
+namespace KeePass2PCL.Serialization
 {
 	/// <summary>
 	/// Serialization to KeePass KDBX files.

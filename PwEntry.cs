@@ -23,12 +23,12 @@ using System.Diagnostics;
 using System.Xml;
 using System.Drawing;
 
-using KeePassLib.Collections;
-using KeePassLib.Interfaces;
-using KeePassLib.Security;
-using KeePassLib.Utility;
+using KeePass2PCL.Collections;
+using KeePass2PCL.Interfaces;
+using KeePass2PCL.Security;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib
+namespace KeePass2PCL
 {
 	/// <summary>
 	/// A class representing a password entry. A password entry consists of several

@@ -22,13 +22,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
-using KeePassLib.Collections;
-using KeePassLib.Delegates;
-using KeePassLib.Interfaces;
-using KeePassLib.Security;
-using KeePassLib.Utility;
+using KeePass2PCL.Collections;
+using KeePass2PCL.Delegates;
+using KeePass2PCL.Interfaces;
+using KeePass2PCL.Security;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib
+namespace KeePass2PCL
 {
 	/// <summary>
 	/// A group containing several password entries.

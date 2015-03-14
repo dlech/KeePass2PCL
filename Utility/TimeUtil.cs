@@ -23,9 +23,9 @@ using System.Text;
 using System.Globalization;
 using System.Diagnostics;
 
-using KeePassLib.Interfaces;
+using KeePass2PCL.Interfaces;
 
-namespace KeePassLib.Utility
+namespace KeePass2PCL.Utility
 {
 	/// <summary>
 	/// Contains various static time structure manipulation and conversion

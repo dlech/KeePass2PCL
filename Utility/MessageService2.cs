@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace KeePassLib
+namespace KeePass2PCL
 {
 	public static class MessageService
 	{

@@ -23,10 +23,10 @@ using System.Collections.Specialized;
 using System.Text;
 using System.Diagnostics;
 
-using KeePassLib.Resources;
-using KeePassLib.Serialization;
+using KeePass2PCL.Resources;
+using KeePass2PCL.Serialization;
 
-namespace KeePassLib.Utility
+namespace KeePass2PCL.Utility
 {
 	public sealed class MessageServiceEventArgs : EventArgs
 	{

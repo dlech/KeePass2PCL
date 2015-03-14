@@ -21,7 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace KeePassLib.Keys
+namespace KeePass2PCL.Keys
 {
 	public enum KeyValidationType
 	{

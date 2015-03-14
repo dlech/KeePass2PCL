@@ -27,10 +27,10 @@ using System.Security.Cryptography;
 using System.IO;
 using System.Diagnostics;
 
-using KeePassLib.Native;
-using KeePassLib.Utility;
+using KeePass2PCL.Native;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Cryptography
+namespace KeePass2PCL.Cryptography
 {
 	/// <summary>
 	/// Cryptographically strong random number generator. The returned values

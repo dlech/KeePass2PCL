@@ -23,11 +23,11 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
 
-using KeePassLib.Delegates;
-using KeePassLib.Interfaces;
-using KeePassLib.Serialization;
+using KeePass2PCL.Delegates;
+using KeePass2PCL.Interfaces;
+using KeePass2PCL.Serialization;
 
-namespace KeePassLib
+namespace KeePass2PCL
 {
 	/// <summary>
 	/// Contains KeePassLib-global definitions and enums.

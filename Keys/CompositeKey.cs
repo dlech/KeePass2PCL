@@ -33,12 +33,12 @@ using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Parameters;
 #endif
 
-using KeePassLib.Native;
-using KeePassLib.Resources;
-using KeePassLib.Security;
-using KeePassLib.Utility;
+using KeePass2PCL.Native;
+using KeePass2PCL.Resources;
+using KeePass2PCL.Security;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Keys
+namespace KeePass2PCL.Keys
 {
 	/// <summary>
 	/// Represents a key. A key can be build up using several user key data sources

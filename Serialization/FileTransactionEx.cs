@@ -27,10 +27,10 @@ using System.Diagnostics;
 using System.Security.AccessControl;
 #endif
 
-using KeePassLib.Native;
-using KeePassLib.Utility;
+using KeePass2PCL.Native;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Serialization
+namespace KeePass2PCL.Serialization
 {
 	public sealed class FileTransactionEx
 	{

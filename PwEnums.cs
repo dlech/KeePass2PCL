@@ -19,7 +19,7 @@
 
 using System;
 
-namespace KeePassLib
+namespace KeePass2PCL
 {
 	/// <summary>
 	/// Compression algorithm specifiers.

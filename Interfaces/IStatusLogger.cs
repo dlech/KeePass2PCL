@@ -20,7 +20,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace KeePassLib.Interfaces
+namespace KeePass2PCL.Interfaces
 {
 	/// <summary>
 	/// Status message types.

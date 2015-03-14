@@ -27,10 +27,10 @@ using PCLCrypto;
 using System.Security.Cryptography;
 #endif
 
-using KeePassLib.Security;
-using KeePassLib.Utility;
+using KeePass2PCL.Security;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Keys
+namespace KeePass2PCL.Keys
 {
 	public sealed class KcpCustomKey : IUserKey
 	{

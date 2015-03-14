@@ -20,7 +20,7 @@
 using System;
 using System.IO;
 
-namespace KeePassLib.Cryptography.Cipher
+namespace KeePass2PCL.Cryptography.Cipher
 {
 	/// <summary>
 	/// Interface of an encryption/decryption class.

@@ -29,7 +29,7 @@ using System.Drawing.Imaging;
 #endif
 using System.Diagnostics;
 
-namespace KeePassLib.Utility
+namespace KeePass2PCL.Utility
 {
 	public static class GfxUtil
 	{

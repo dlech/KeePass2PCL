@@ -28,11 +28,11 @@ using System.Threading;
 #endif
 using System.Diagnostics;
 
-using KeePassLib.Cryptography;
-using KeePassLib.Resources;
-using KeePassLib.Utility;
+using KeePass2PCL.Cryptography;
+using KeePass2PCL.Resources;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Serialization
+namespace KeePass2PCL.Serialization
 {
 	public sealed class FileLockException : Exception
 	{

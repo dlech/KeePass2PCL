@@ -22,8 +22,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General assembly properties
-
-
 [assembly: AssemblyTitle("KeePassLib")]
 [assembly: AssemblyDescription("KeePass Password Management Library")]
 [assembly: AssemblyConfiguration("")]

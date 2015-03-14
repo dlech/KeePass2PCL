@@ -21,10 +21,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using KeePassLib.Resources;
-using KeePassLib.Utility;
+using KeePass2PCL.Resources;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Serialization
+namespace KeePass2PCL.Serialization
 {
 	public sealed class OldFormatException : Exception
 	{

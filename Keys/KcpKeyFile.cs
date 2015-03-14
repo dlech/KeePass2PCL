@@ -32,13 +32,13 @@ using System.Security.Cryptography;
 #endif
 using System.Diagnostics;
 
-using KeePassLib.Cryptography;
-using KeePassLib.Resources;
-using KeePassLib.Security;
-using KeePassLib.Serialization;
-using KeePassLib.Utility;
+using KeePass2PCL.Cryptography;
+using KeePass2PCL.Resources;
+using KeePass2PCL.Security;
+using KeePass2PCL.Serialization;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Keys
+namespace KeePass2PCL.Keys
 {
 	/// <summary>
 	/// Key files as provided by the user.

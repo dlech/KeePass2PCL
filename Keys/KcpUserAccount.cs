@@ -22,12 +22,12 @@ using System.Security;
 using System.Security.Cryptography;
 using System.IO;
 
-using KeePassLib.Cryptography;
-using KeePassLib.Resources;
-using KeePassLib.Security;
-using KeePassLib.Utility;
+using KeePass2PCL.Cryptography;
+using KeePass2PCL.Resources;
+using KeePass2PCL.Security;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Keys
+namespace KeePass2PCL.Keys
 {
 	/// <summary>
 	/// A user key depending on the currently logged on Windows user account.

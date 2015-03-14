@@ -19,7 +19,7 @@
 
 using System;
 
-namespace KeePassLib.Keys
+namespace KeePass2PCL.Keys
 {
 	[Flags]
 	public enum UserKeyType

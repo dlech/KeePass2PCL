@@ -32,9 +32,9 @@ using System.Security.Cryptography;
 #endif
 using System.Drawing;
 
-using KeePassLib.Utility;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Translation
+namespace KeePass2PCL.Translation
 {
 	public sealed class KpccLayout
 	{

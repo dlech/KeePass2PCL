@@ -20,15 +20,16 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Diagnostics;
 
-namespace KeePassLib.Native
+namespace KeePass2PCL.Native
 {
 	internal static partial class NativeMethods
 	{
-#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT)
 		[StructLayout(LayoutKind.Sequential)]
 		private struct XClassHint
 		{

@@ -22,14 +22,14 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 
-using KeePassLib.Delegates;
-using KeePassLib.Interfaces;
+using KeePass2PCL.Delegates;
+using KeePass2PCL.Interfaces;
 
 #if KeePassLibSD
 using KeePassLibSD;
 #endif
 
-namespace KeePassLib.Collections
+namespace KeePass2PCL.Collections
 {
 	public sealed class PwObjectPool
 	{

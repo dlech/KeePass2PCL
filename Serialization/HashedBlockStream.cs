@@ -28,14 +28,14 @@ using System.Security.Cryptography;
 using System.Diagnostics;
 using System.Text;
 
-using KeePassLib.Native;
-using KeePassLib.Utility;
+using KeePass2PCL.Native;
+using KeePass2PCL.Utility;
 
 #if KeePassLibSD
 using KeePassLibSD;
 #endif
 
-namespace KeePassLib.Serialization
+namespace KeePass2PCL.Serialization
 {
 	public sealed class HashedBlockStream : Stream
 	{

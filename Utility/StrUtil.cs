@@ -32,13 +32,13 @@ using System.Security.Cryptography;
 using System.Globalization;
 using System.Diagnostics;
 
-using KeePassLib.Collections;
-using KeePassLib.Cryptography.PasswordGenerator;
-using KeePassLib.Native;
-using KeePassLib.Security;
-using KeePassLib.Resources;
+using KeePass2PCL.Collections;
+using KeePass2PCL.Cryptography.PasswordGenerator;
+using KeePass2PCL.Native;
+using KeePass2PCL.Security;
+using KeePass2PCL.Resources;
 
-namespace KeePassLib.Utility
+namespace KeePass2PCL.Utility
 {
 	/// <summary>
 	/// Character stream class.

@@ -30,10 +30,10 @@ using System.Diagnostics;
 using PCLStorage;
 #endif
 
-using KeePassLib.Interfaces;
-using KeePassLib.Utility;
+using KeePass2PCL.Interfaces;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Serialization
+namespace KeePass2PCL.Serialization
 {
 	public enum IOCredSaveMode
 	{

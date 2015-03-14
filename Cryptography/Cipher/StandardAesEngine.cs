@@ -41,9 +41,9 @@ using Org.BouncyCastle.Crypto.Parameters;
 
 #endif
 
-using KeePassLib.Resources;
+using KeePass2PCL.Resources;
 
-namespace KeePassLib.Cryptography.Cipher
+namespace KeePass2PCL.Cryptography.Cipher
 {
 	/// <summary>
 	/// Standard AES cipher implementation.

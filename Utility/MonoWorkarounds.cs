@@ -24,9 +24,9 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Diagnostics;
 
-using KeePassLib.Native;
+using KeePass2PCL.Native;
 
-namespace KeePassLib.Utility
+namespace KeePass2PCL.Utility
 {
 	public static class MonoWorkarounds
 	{

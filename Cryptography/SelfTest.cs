@@ -29,14 +29,14 @@ using System.Text;
 using System.Globalization;
 using System.Diagnostics;
 
-using KeePassLib.Cryptography.Cipher;
-using KeePassLib.Keys;
-using KeePassLib.Native;
-using KeePassLib.Utility;
-using KeePassLib.Resources;
-using KeePassLib.Security;
+using KeePass2PCL.Cryptography.Cipher;
+using KeePass2PCL.Keys;
+using KeePass2PCL.Native;
+using KeePass2PCL.Utility;
+using KeePass2PCL.Resources;
+using KeePass2PCL.Security;
 
-namespace KeePassLib.Cryptography
+namespace KeePass2PCL.Cryptography
 {
 	/* /// <summary>
 	/// Return values of the <c>SelfTest.Perform</c> method.

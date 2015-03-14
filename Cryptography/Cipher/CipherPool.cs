@@ -24,7 +24,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Security;
 
-namespace KeePassLib.Cryptography.Cipher
+namespace KeePass2PCL.Cryptography.Cipher
 {
 	/// <summary>
 	/// Pool of encryption/decryption algorithms (ciphers).

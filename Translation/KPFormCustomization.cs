@@ -24,7 +24,7 @@ using System.Xml.Serialization;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace KeePassLib.Translation
+namespace KeePass2PCL.Translation
 {
 	public sealed class KPFormCustomization
 	{

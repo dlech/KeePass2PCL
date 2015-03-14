@@ -23,7 +23,7 @@ using System.Text;
 using System.IO;
 using System.Xml;
 
-namespace KeePassLib.Interfaces
+namespace KeePass2PCL.Interfaces
 {
 	public interface IXmlSerializerEx
 	{

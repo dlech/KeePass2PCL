@@ -25,9 +25,9 @@ using PCLCrypto;
 using System.Security.Cryptography;
 #endif
 
-using KeePassLib.Cryptography.Cipher;
+using KeePass2PCL.Cryptography.Cipher;
 
-namespace KeePassLib.Cryptography
+namespace KeePass2PCL.Cryptography
 {
 	/// <summary>
 	/// Algorithms supported by <c>CryptoRandomStream</c>.

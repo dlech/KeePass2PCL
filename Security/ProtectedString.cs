@@ -21,8 +21,8 @@ using System;
 using System.Text;
 using System.Diagnostics;
 
-using KeePassLib.Cryptography;
-using KeePassLib.Utility;
+using KeePass2PCL.Cryptography;
+using KeePass2PCL.Utility;
 
 #if KeePassLibSD
 using KeePassLibSD;
@@ -30,7 +30,7 @@ using KeePassLibSD;
 
 // SecureString objects are limited to 65536 characters, don't use
 
-namespace KeePassLib.Security
+namespace KeePass2PCL.Security
 {
 	/// <summary>
 	/// Represents an in-memory encrypted string.

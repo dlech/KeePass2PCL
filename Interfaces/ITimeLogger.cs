@@ -19,7 +19,7 @@
 
 using System;
 
-namespace KeePassLib.Interfaces
+namespace KeePass2PCL.Interfaces
 {
 	/// <summary>
 	/// Interface for objects that support various times (creation time, last

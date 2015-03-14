@@ -22,10 +22,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 
-using KeePassLib.Security;
-using KeePassLib.Utility;
+using KeePass2PCL.Security;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Cryptography.PasswordGenerator
+namespace KeePass2PCL.Cryptography.PasswordGenerator
 {
 	internal static class PatternBasedGenerator
 	{

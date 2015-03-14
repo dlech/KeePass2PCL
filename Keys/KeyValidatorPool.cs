@@ -23,9 +23,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 
-using KeePassLib.Utility;
+using KeePass2PCL.Utility;
 
-namespace KeePassLib.Keys
+namespace KeePass2PCL.Keys
 {
 	public sealed class KeyValidatorPool : IEnumerable<KeyValidator>
 	{
