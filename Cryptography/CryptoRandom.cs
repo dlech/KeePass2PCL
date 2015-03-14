@@ -174,8 +174,16 @@ namespace KeePass2PCL.Cryptography
 			pb = MemUtil.UInt32ToBytes((uint)rWeak.Next());
 			ms.Write(pb, 0, pb.Length);
 
+#if KeePass2PCL
+			pb = MemUtil.UInt32ToBytes((uint)Environment.ProcessorCount);
+			ms.Write(pb, 0, pb.Length);
+
+			pb = MemUtil.UInt32ToBytes((uint)Environment.CurrentManagedThreadId);
+			ms.Write(pb, 0, pb.Length);
+#else
 			pb = MemUtil.UInt32ToBytes((uint)NativeLib.GetPlatformID());
 			ms.Write(pb, 0, pb.Length);
+#endif
 
 #if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
 			Process p = null;

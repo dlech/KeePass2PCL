@@ -127,11 +127,10 @@ namespace KeePass2PCL.Cryptography
 			{
 				try
 				{
-#if KeePass2PCL
-					m_pbFinalHash = m_hash.TransformFinalBlock(new byte[0], 0, 0);
-#else
 					m_hash.TransformFinalBlock(new byte[0], 0, 0);
-
+#if KeePass2PCL
+					m_pbFinalHash = (m_hash as CryptographicHash).GetValueAndReset ();
+#else
 					m_pbFinalHash = m_hash.Hash;
 #endif
 				}

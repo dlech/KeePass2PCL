@@ -12,18 +12,14 @@ namespace KeePass2PCL.Utility
 
 		public static Color FromHtml(string htmlColor)
 		{
-			try {
-				return Color.FromName(htmlColor);
-			} catch (Exception) {
-				Match match = longForm.Match(htmlColor);
-				if (!match.Success)
-					match = shortForm.Match(htmlColor);
-				if (match.Success) {
-					var r = int.Parse(match.Groups [1].Value);
-					var g = int.Parse(match.Groups [2].Value);
-					var b = int.Parse(match.Groups [3].Value);
-					return Color.FromArgb(r, g, b);
-				}
+			Match match = longForm.Match(htmlColor);
+			if (!match.Success)
+				match = shortForm.Match(htmlColor);
+			if (match.Success) {
+				var r = int.Parse(match.Groups[1].Value, NumberStyles.HexNumber);
+				var g = int.Parse(match.Groups[2].Value, NumberStyles.HexNumber);
+				var b = int.Parse(match.Groups[3].Value, NumberStyles.HexNumber);
+				return Color.FromArgb(r, g, b);
 			}
 			throw new Exception(string.Format("Could not parse HTML color '{0}'.", htmlColor));
 		}

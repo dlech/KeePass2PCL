@@ -435,7 +435,8 @@ namespace KeePass2PCL.Serialization
 		private static Stream OpenReadLocal(IOConnectionInfo ioc)
 		{
 #if KeePass2PCL
-			var file = FileSystem.Current.GetFileFromPathAsync(ioc.Path).Result;
+			var local = FileSystem.Current.LocalStorage;
+			var file = local.GetFileAsync(ioc.Path).Result;
 			return file.OpenAsync(PCLStorage.FileAccess.Read).Result;
 #else
 			return new FileStream(ioc.Path, FileMode.Open, FileAccess.Read,
@@ -477,8 +478,9 @@ namespace KeePass2PCL.Serialization
 		private static Stream OpenWriteLocal(IOConnectionInfo ioc)
 		{
 #if KeePass2PCL
-			var file = FileSystem.Current.GetFileFromPathAsync(ioc.Path).Result;
-			return file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite).Result;
+			var local = FileSystem.Current.LocalStorage;
+			var file = local.CreateFileAsync(ioc.Path, CreationCollisionOption.OpenIfExists).Result;
+			return file.OpenAsync(FileAccess.ReadAndWrite).Result;
 #else
 			return new FileStream(ioc.Path, FileMode.Create, FileAccess.Write,
 				FileShare.None);

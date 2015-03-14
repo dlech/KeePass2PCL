@@ -129,6 +129,7 @@ namespace KeePass2PCL.Serialization
 					Encoding = encNoBom,
 					Indent = true,
 					IndentChars = "\t",
+					NewLineChars = "\r\n",
 				};
 				m_xmlWriter = XmlWriter.Create(writerStream, settings);
 #else

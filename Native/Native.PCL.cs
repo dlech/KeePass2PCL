@@ -10,11 +10,6 @@ namespace KeePass2PCL.Native
 			get { throw new NotImplementedException(); }
 		}
 
-		public static PlatformID GetPlatformID()
-		{
-			throw new NotImplementedException();
-		}
-
 		public static bool IsUnix()
 		{
 			return true;
