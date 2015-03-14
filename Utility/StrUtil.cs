@@ -317,7 +317,7 @@ namespace KeePass2PCL.Utility
 			str = str.Replace("\'", @"&#39;");
 
 			str = NormalizeNewLines(str, false);
-			str = str.Replace("\n", @"<br />" + MessageService.NewLine);
+			str = str.Replace("\n", @"<br />" + Environment.NewLine);
 
 			return str;
 		}
@@ -491,13 +491,13 @@ namespace KeePass2PCL.Utility
 			string strText = string.Empty;
 			
 			if(excp.Message != null)
-				strText += excp.Message + MessageService.NewLine;
+				strText += excp.Message + Environment.NewLine;
 #if !KeePassLibSD
 			if(excp.Source != null)
-				strText += excp.Source + MessageService.NewLine;
+				strText += excp.Source + Environment.NewLine;
 #endif
 			if(excp.StackTrace != null)
-				strText += excp.StackTrace + MessageService.NewLine;
+				strText += excp.StackTrace + Environment.NewLine;
 #if !KeePassLibSD
 #if !KeePass2PCL && !KeePassRT
 			if(excp.TargetSite != null)
@@ -506,24 +506,24 @@ namespace KeePass2PCL.Utility
 
 			if(excp.Data != null)
 			{
-				strText += MessageService.NewLine;
+				strText += Environment.NewLine;
 				foreach(DictionaryEntry de in excp.Data)
 					strText += @"'" + de.Key + @"' -> '" + de.Value + @"'" +
-						MessageService.NewLine;
+						Environment.NewLine;
 			}
 #endif
 
 			if(excp.InnerException != null)
 			{
-				strText += MessageService.NewLine + "Inner:" + MessageService.NewLine;
+				strText += Environment.NewLine + "Inner:" + Environment.NewLine;
 				if(excp.InnerException.Message != null)
-					strText += excp.InnerException.Message + MessageService.NewLine;
+					strText += excp.InnerException.Message + Environment.NewLine;
 #if !KeePassLibSD
 				if(excp.InnerException.Source != null)
-					strText += excp.InnerException.Source + MessageService.NewLine;
+					strText += excp.InnerException.Source + Environment.NewLine;
 #endif
 				if(excp.InnerException.StackTrace != null)
-					strText += excp.InnerException.StackTrace + MessageService.NewLine;
+					strText += excp.InnerException.StackTrace + Environment.NewLine;
 #if !KeePassLibSD
 #if !KeePass2PCL && !KeePassRT
 				if(excp.InnerException.TargetSite != null)
@@ -532,10 +532,10 @@ namespace KeePass2PCL.Utility
 
 				if(excp.InnerException.Data != null)
 				{
-					strText += MessageService.NewLine;
+					strText += Environment.NewLine;
 					foreach(DictionaryEntry de in excp.InnerException.Data)
 						strText += @"'" + de.Key + @"' -> '" + de.Value + @"'" +
-							MessageService.NewLine;
+							Environment.NewLine;
 				}
 #endif
 			}
@@ -1035,7 +1035,7 @@ namespace KeePass2PCL.Utility
 
 		public static string GetNewLineSeq(string str)
 		{
-			if(str == null) { Debug.Assert(false); return MessageService.NewLine; }
+			if(str == null) { Debug.Assert(false); return Environment.NewLine; }
 
 			int n = str.Length, nLf = 0, nCr = 0, nCrLf = 0;
 			char chLast = char.MinValue;
@@ -1057,7 +1057,7 @@ namespace KeePass2PCL.Utility
 			nLf -= nCrLf;
 
 			int nMax = Math.Max(nCrLf, Math.Max(nCr, nLf));
-			if(nMax == 0) return MessageService.NewLine;
+			if(nMax == 0) return Environment.NewLine;
 
 			if(nCrLf == nMax) return "\r\n";
 			return ((nLf == nMax) ? "\n" : "\r");

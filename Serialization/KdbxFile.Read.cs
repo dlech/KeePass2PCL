@@ -208,7 +208,7 @@ namespace KeePass2PCL.Serialization
 			uint uVersion = MemUtil.BytesToUInt32(pb);
 			if((uVersion & FileVersionCriticalMask) > (FileVersion32 & FileVersionCriticalMask))
 				throw new FormatException(KLRes.FileVersionUnsupported +
-					MessageService.NewParagraph + KLRes.FileNewVerReq);
+					Environment.NewLine + Environment.NewLine + KLRes.FileNewVerReq);
 
 			while(true)
 			{

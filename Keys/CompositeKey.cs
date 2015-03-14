@@ -452,8 +452,8 @@ namespace KeePass2PCL.Keys
 		{
 			get
 			{
-				return KLRes.InvalidCompositeKey + MessageService.NewParagraph +
-					KLRes.InvalidCompositeKeyHint;
+				return KLRes.InvalidCompositeKey + Environment.NewLine
+					+ Environment.NewLine + KLRes.InvalidCompositeKeyHint;
 			}
 		}
 

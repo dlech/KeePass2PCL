@@ -45,7 +45,7 @@ namespace KeePass2PCL.Serialization
 					(@" (" + m_strFormat + @")") : string.Empty) + ".";
 
 				if(m_type == OldFormatType.KeePass1x)
-					str += MessageService.NewParagraph + KLRes.KeePass1xHint;
+					str += Environment.NewLine + Environment.NewLine + KLRes.KeePass1xHint;
 
 				return str;
 			}

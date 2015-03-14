@@ -101,12 +101,6 @@
     <Compile Include="Serialization\KdbxFile.Write.cs" />
     <Compile Include="Serialization\IOConnectionInfo.cs" />
     <Compile Include="Serialization\OldFormatException.cs" />
-    <Compile Include="Translation\KPControlCustomization.cs" />
-    <Compile Include="Translation\KPFormCustomization.cs" />
-    <Compile Include="Translation\KPStringTable.cs" />
-    <Compile Include="Translation\KPStringTableItem.cs" />
-    <Compile Include="Translation\KPTranslation.cs" />
-    <Compile Include="Translation\KPTranslationProperties.cs" />
     <Compile Include="Utility\AppLogEx.cs" />
     <Compile Include="Utility\GfxUtil.cs" />
     <Compile Include="Utility\MemUtil.cs" />
@@ -115,7 +109,6 @@
     <Compile Include="Utility\StrUtil.cs" />
     <Compile Include="Utility\UrlUtil.cs" />
     <Compile Include="Utility\TimeUtil.cs" />
-    <Compile Include="Utility\MessageService2.cs" />
     <Compile Include="Cryptography\HashingStreamEx.cs" />
     <Compile Include="Native\Native.PCL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -129,6 +122,12 @@
     <None Include="Native\NativeMethods.cs" />
     <None Include="Native\NativeMethods.Unix.cs" />
     <None Include="Keys\KcpUserAccount.cs" />
+    <None Include="Translation\KPControlCustomization.cs" />
+    <None Include="Translation\KPFormCustomization.cs" />
+    <None Include="Translation\KPStringTable.cs" />
+    <None Include="Translation\KPStringTableItem.cs" />
+    <None Include="Translation\KPTranslation.cs" />
+    <None Include="Translation\KPTranslationProperties.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ProjectExtensions>

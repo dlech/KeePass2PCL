@@ -23,13 +23,10 @@ using System.Text;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Windows.Forms;
 using System.ComponentModel;
 using System.Drawing;
 using System.Diagnostics;
-
-#if KeePass2PCL
-using PCLStorage;
-#endif
 
 using KeePass2PCL.Interfaces;
 using KeePass2PCL.Utility;
@@ -100,13 +97,8 @@ namespace KeePass2PCL.Translation
 		{
 			if(xs == null) throw new ArgumentNullException("xs");
 
-#if KeePass2PCL
-			var file = FileSystem.Current.GetFileFromPathAsync(strFileName).Result;
-			var fs = file.OpenAsync(FileAccess.ReadAndWrite).Result;
-#else
 			FileStream fs = new FileStream(strFileName, FileMode.Create,
 				FileAccess.Write, FileShare.None);
-#endif
 
 #if !KeePassLibSD
 			GZipStream gz = new GZipStream(fs, CompressionMode.Compress);
@@ -124,9 +116,9 @@ namespace KeePass2PCL.Translation
 
 			xs.Serialize(xw, kpTrl);
 
-			xw.Dispose();
-			gz.Dispose();
-			fs.Dispose();
+			xw.Close();
+			gz.Close();
+			fs.Close();
 		}
 
 		public static KPTranslation LoadFromFile(string strFile,
@@ -134,13 +126,8 @@ namespace KeePass2PCL.Translation
 		{
 			if(xs == null) throw new ArgumentNullException("xs");
 
-#if KeePass2PCL
-			var file = FileSystem.Current.GetFileFromPathAsync(strFile).Result;
-			var fs = file.OpenAsync(FileAccess.Read).Result;
-#else
 			FileStream fs = new FileStream(strFile, FileMode.Open,
 				FileAccess.Read, FileShare.Read);
-#endif
 
 #if !KeePassLibSD
 			GZipStream gz = new GZipStream(fs, CompressionMode.Decompress);
@@ -150,8 +137,8 @@ namespace KeePass2PCL.Translation
 
 			KPTranslation kpTrl = (xs.Deserialize(gz) as KPTranslation);
 
-			gz.Dispose();
-			fs.Dispose();
+			gz.Close();
+			fs.Close();
 			return kpTrl;
 		}
 
@@ -166,7 +153,7 @@ namespace KeePass2PCL.Translation
 			return new Dictionary<string, string>();
 		}
 
-#if (false && !KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT)
 		public void ApplyTo(Form form)
 		{
 			if(form == null) throw new ArgumentNullException("form");

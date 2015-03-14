@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
+using System.Windows.Forms;
 using System.Diagnostics;
 
 namespace KeePass2PCL.Translation
@@ -65,7 +66,7 @@ namespace KeePass2PCL.Translation
 			return dict;
 		}
 
-#if (false && !KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT)
 		public void ApplyTo(ToolStripItemCollection tsic)
 		{
 			if(tsic == null) throw new ArgumentNullException("tsic");

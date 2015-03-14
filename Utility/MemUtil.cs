@@ -20,11 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-#if KeePass2PCL
-using PCLCrypto;
-#else
-using System.Security.Cryptography;
-#endif
 using System.Diagnostics;
 using System.IO;
 

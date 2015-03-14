@@ -21,15 +21,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
+using System.Windows.Forms;
 using System.Diagnostics;
 using System.Xml.Serialization;
 using System.Globalization;
 using System.IO;
-#if KeePass2PCL
-using PCLCrypto;
-#else
 using System.Security.Cryptography;
-#endif
 using System.Drawing;
 
 using KeePass2PCL.Utility;
@@ -115,7 +112,7 @@ namespace KeePass2PCL.Translation
 			else { Debug.Assert(false); }
 		}
 
-#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT)
 		internal void ApplyTo(Control c)
 		{
 			Debug.Assert(c != null); if(c == null) return;
@@ -270,7 +267,7 @@ namespace KeePass2PCL.Translation
 			return m_strMemberName.CompareTo(kpOther.Name);
 		}
 
-#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT)
 		private static readonly Type[] m_vTextControls = new Type[] {
 			typeof(MenuStrip), typeof(PictureBox), typeof(ListView),
 			typeof(TreeView), typeof(ToolStrip), typeof(WebBrowser),

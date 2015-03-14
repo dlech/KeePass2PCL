@@ -50,16 +50,16 @@ namespace KeePass2PCL.Serialization
 			if(!string.IsNullOrEmpty(strBaseFile))
 			{
 				sb.Append(strBaseFile);
-				sb.Append(MessageService.NewParagraph);
+				sb.Append(Environment.NewLine + Environment.NewLine);
 			}
 
 			sb.Append(KLRes.FileLockedWrite);
-			sb.Append(MessageService.NewLine);
+			sb.Append(Environment.NewLine);
 
 			if(!string.IsNullOrEmpty(strUser)) sb.Append(strUser);
 			else sb.Append("?");
 
-			sb.Append(MessageService.NewParagraph);
+			sb.Append(Environment.NewLine + Environment.NewLine);
 			sb.Append(KLRes.TryAgainSecs);
 
 			m_strMsg = sb.ToString();

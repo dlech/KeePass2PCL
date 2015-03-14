@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
+using System.Windows.Forms;
 using System.Diagnostics;
 
 using KeePass2PCL.Resources;
@@ -157,7 +158,7 @@ namespace KeePass2PCL.Utility
 			return sbText.ToString();
 		}
 
-#if (false && !KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT)
 		internal static Form GetTopForm()
 		{
 			FormCollection fc = Application.OpenForms;
@@ -205,7 +206,7 @@ namespace KeePass2PCL.Utility
 #endif
 		}
 
-#if (false && !KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT)
 		internal delegate DialogResult SafeShowMessageBoxInternalDelegate(IWin32Window iParent,
 			string strText, string strTitle, MessageBoxButtons mb, MessageBoxIcon mi,
 			MessageBoxDefaultButton mdb);
