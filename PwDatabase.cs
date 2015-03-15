@@ -24,7 +24,7 @@ using System.IO;
 using System.Drawing;
 
 #if KeePass2PCL
-using Splat;
+using Image = Splat.IBitmap;
 #endif
 
 using KeePass2PCL.Collections;
@@ -1467,11 +1467,7 @@ namespace KeePass2PCL
 		/// </summary>
 		/// <param name="pwIconId">ID of the icon.</param>
 		/// <returns>Image data.</returns>
-#if KeePass2PCL
-		public IBitmap GetCustomIcon(PwUuid pwIconId)
-#else
 		public Image GetCustomIcon(PwUuid pwIconId)
-#endif
 		{
 			int nIndex = GetCustomIconIndex(pwIconId);
 

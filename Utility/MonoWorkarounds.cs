@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 using System.ComponentModel;
 using System.Reflection;
 using System.Diagnostics;
@@ -98,7 +99,6 @@ namespace KeePass2PCL.Utility
 			return true;
 		}
 
-#if !KeePass2PCL
 		public static void ApplyTo(Form f)
 		{
 			if(!MonoWorkarounds.IsRequired()) return;
@@ -117,15 +117,14 @@ namespace KeePass2PCL.Utility
 			if(!MonoWorkarounds.IsRequired()) return;
 			if(f == null) { Debug.Assert(false); return; }
 
-#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT)
 			f.HandleCreated -= MonoWorkarounds.OnFormHandleCreated;
 
 			ApplyToControlsRec(f.Controls, f, MonoWorkarounds.ReleaseControl);
 #endif
 		}
-#endif
 
-#if (!KeePass2PCL && !KeePassLibSD && !KeePassRT)
+#if (!KeePassLibSD && !KeePassRT)
 		private delegate void MwaControlHandler(Control c, Form fContext);
 
 		private static void ApplyToControlsRec(Control.ControlCollection cc,
