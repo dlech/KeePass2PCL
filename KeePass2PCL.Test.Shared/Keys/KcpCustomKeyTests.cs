@@ -7,7 +7,7 @@ using KeePassLib.Keys;
 using KeePass2PCL.Keys;
 #endif
 
-namespace KeePass2PCL.Test.Shared
+namespace KeePass2PCL.Test.Shared.Keys
 {
   [TestFixture ()]
   public class KcpCustomKeyTests

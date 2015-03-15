@@ -8,7 +8,7 @@ using KeePassLib.Cryptography;
 using KeePass2PCL.Cryptography;
 #endif
 
-namespace KeePass2PCL.Test.Shared
+namespace KeePass2PCL.Test.Shared.Cryptography
 {
   [TestFixture ()]
   public class HmacOtpTests

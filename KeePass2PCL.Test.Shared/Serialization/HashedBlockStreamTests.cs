@@ -8,7 +8,7 @@ using KeePassLib.Serialization;
 using KeePass2PCL.Serialization;
 #endif
 
-namespace KeePass2PCL.Test.Shared
+namespace KeePass2PCL.Test.Shared.Serialization
 {
   [TestFixture ()]
   public class HashedBlockStreamTests

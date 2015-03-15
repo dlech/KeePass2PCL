@@ -20,9 +20,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Keys\KcpPasswordTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serialization\HashedBlockStreamTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serialization\KdbxFileTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utility\GfxUtilTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Keys\" />
     <Folder Include="$(MSBuildThisFileDirectory)Serialization\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Utility\" />
   </ItemGroup>
 </Project>

@@ -9,7 +9,7 @@ using KeePass2PCL.Cryptography.Cipher;
 
 using NUnit.Framework;
 
-namespace KeePass2PCL.Test.Shared
+namespace KeePass2PCL.Test.Shared.Cryptography.Cipher
 {
   [TestFixture ()]
   public class StandardAesEngineTests
