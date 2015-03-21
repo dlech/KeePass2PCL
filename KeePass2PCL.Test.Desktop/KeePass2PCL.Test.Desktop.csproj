@@ -33,7 +33,7 @@
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Splat">
-      <HintPath>..\packages\Splat.1.6.1\lib\Gdk\Splat.dll</HintPath>
+      <HintPath>..\packages\MoreSplat.1.6.1\lib\GtkSharp3\Splat.dll</HintPath>
     </Reference>
     <Reference Include="PCLStorage">
       <HintPath>..\packages\PCLStorage.1.0.2\lib\net45\PCLStorage.dll</HintPath>
